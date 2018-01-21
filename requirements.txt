@@ -16,3 +16,4 @@ xlsxwriter
 bottle
 googletrans
 polib
+openpyxl

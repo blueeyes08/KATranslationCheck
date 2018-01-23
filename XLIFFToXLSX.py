@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 from XLIFFReader import parse_xliff_file
-from collections import namedtuple
-import xlsxwriter
 import itertools
 import bs4
 import os
+
+import xlsxwriter
+from collections import namedtuple
 
 def xlsx_write_rows(filename, rows):
     """

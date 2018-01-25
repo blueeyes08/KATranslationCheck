@@ -175,7 +175,7 @@ def readAndProcessXLIFF(lang, filename, fileid, indexer, autotranslator, upload=
     if upload and autotranslated_count > 0:
         basename = os.path.basename(filename)
         print(blue("Uploading {} (approve={})...".format(basename, approve)))
-        upload_file(outfilename, fileid, auto_approve=approve, lang=lang, fullauto_account=fullauto_account)
+        upload_file(outfilename, fileid, auto_approve=approve, lang=lang, fullauto_account=fullauto_account, duplicates=overwrite)
         print(green("Uploaded {}".format(basename)))
     return autotranslated_count
 

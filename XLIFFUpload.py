@@ -4,11 +4,13 @@ import os.path
 import subprocess
 from UpdateAllFiles import getCrowdinSession
 
-def upload_file(filename, fileid, auto_approve=False, lang="lol", fullauto_account=False):
+def upload_file(filename, fileid, auto_approve=False, lang="lol", fullauto_account=False, duplicates=False):
     auto_approve = 1 if auto_approve else 0
     basename = os.path.basename(filename)
     url = "https://crowdin.com/project/khanacademy/{}/{}/upload?import_eq_suggestions=1&{}qqfile={}".format(
         lang, fileid, "auto_approve_imported=1&" if auto_approve else "", basename)
+    if duplicates:
+        url += "&import_duplicates=1"
 
     s = getCrowdinSession(fullauto_account=fullauto_account)
     with open(filename, "rb") as infile:

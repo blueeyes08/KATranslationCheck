@@ -104,5 +104,5 @@ if __name__ == "__main__":
         if not filename.endswith(".xliff"):
             continue
         inpath = os.path.join(args.indir, filename)
-        outpath = os.path.join(args.outdir, filename)
+        outpath = os.path.join(args.outdir, filename.replace(".xliff", ".xlsx"))
         convertXLIFFToXLSX(inpath, outpath)

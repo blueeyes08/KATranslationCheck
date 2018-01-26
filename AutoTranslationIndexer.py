@@ -42,7 +42,7 @@ class TextTagIndexer(object):
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
         self._re = get_text_content_regex()
 
-    def add(self, engl, translated=None, filename=None):
+    def add(self, engl, translated=None, filename=None, approved=False):
         # Find english hits and possible hits in target lang to be able to match them!
         engl_hits = self._re.finditer(engl)
         # Just make sure that transl_hits has the same length as index
@@ -121,7 +121,7 @@ class IgnoreFormulaPatternIndexer(object):
     """
     Indexes patterns with only the text as key, replacing all formulas with §formula§
     """
-    def __init__(self, lang):
+    def __init__(self, lang, ignore_translation_state=True):
         self.lang = lang
         self.autotrans = RuleAutotranslator()
         # Preindex filter
@@ -129,7 +129,7 @@ class IgnoreFormulaPatternIndexer(object):
         self.preindex_ctr = Counter() # norm engl hash => count
         self.preindex_min_count = 2 # minimum instances to be considered a pattern
         self.preindex_set = set() # Compiled from preindex_ctr in clean_preindex()
-
+        self.ignore_translation_state = ignore_translation_state
         self.index = Counter() # norm engl => count
         self.untranslated_index = Counter() # norm engl => count
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
@@ -182,7 +182,7 @@ class IgnoreFormulaPatternIndexer(object):
             del self.preindex_ctr[todel]
         
 
-    def add(self, engl, translated=None, filename=None):
+    def add(self, engl, translated=None, filename=None, approved=False):
         normalized_engl = self._normalize(engl)
         # Check if present in preindex. If not, its not worth investigating this string any more
         h = hash_string(normalized_engl)
@@ -205,6 +205,10 @@ class IgnoreFormulaPatternIndexer(object):
             normalized_trans = self._formula_re.sub("§formula§", translated)
             normalized_trans = self._img_re.sub("§image§", normalized_trans)
             self.translated_index[normalized_engl][normalized_trans] += 1
+            # If options is set, index translated just like untranslated
+            if self.ignore_translation_state and not approved:
+                self.untranslated_index[normalized_engl] += 1
+                self.filename_index[normalized_engl][filename] += 1
         else: # untranslated
             self.untranslated_index[normalized_engl] += 1
             self.filename_index[normalized_engl][filename] += 1
@@ -262,7 +266,7 @@ class GenericPatternIndexer(object):
         self.autotranslator = RuleAutotranslator()
         self._re = re.compile(r"\d")
 
-    def add(self, engl, translated=None, filename=None):
+    def add(self, engl, translated=None, filename=None, approved=False):
         # If the autotranslator can translate it, ignore it
         if self.autotranslator.translate(engl) is not None:
             return

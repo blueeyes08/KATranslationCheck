@@ -101,7 +101,7 @@ def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=Tr
         # Index tags in the indexer (e.g. to extract text tags)
         # This is done even if they are translated
         # NOTE: This does index or preindex (chosen outside of the loop)
-        indexFN(engl, None if is_untranslated else translated, filename=filename)
+        indexFN(engl, None if is_untranslated else translated, filename=filename, approved=is_approved)
 
         # For indexing run, ignore autotranslator altogether
         if not autotranslate and not will_overwrite:

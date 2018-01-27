@@ -148,7 +148,7 @@ class IgnoreFormulaPatternIndexer(object):
         normalized_engl = self._img_re.sub("§image§", normalized_engl)
         return normalized_engl
 
-    def preindex(self, engl, translated=None, filename=None):
+    def preindex(self, engl, translated=None, filename=None, approved=False):
         """
         Index
         Kind of similar to a bloom filter, but not strictly probabilistic

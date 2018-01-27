@@ -60,6 +60,10 @@ class RuleAutotranslator(object):
         is_input = self._is_input.match(engl) is not None
         is_simple_coordinate = self._is_simple_coordinate.match(engl) is not None
 
+        # ONLY for pt-PT special demand
+        if is_perseus_img_url or is_formula_plus_img:
+            return None
+
         if is_perseus_img_url or is_formula_plus_img or is_input or is_formula_plus_input or is_simple_coordinate:
             return engl
         if is_formula and not contains_text:

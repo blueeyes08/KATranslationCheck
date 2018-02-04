@@ -269,7 +269,9 @@ def autotranslate_xliffs(args):
         ignore_formula_pattern_idxer.exportXLSX(ignore_alltranslated)
         ignore_formula_pattern_idxer.exportXLIFF(ignore_alltranslated)
         #pattern_indexer.exportCSV(os.path.join("output-" + args.language, "patterns.csv"))
-
+    if "ifpattern_autotranslator" in locals():
+        print("Could not translate {} strings due to missing text tags".format(
+            ifpattern_autotranslator.textTagMissingCounter))
     if args.update_index_source:
         update_crowdin_index_files(args.language)
 

@@ -82,6 +82,7 @@ class IFPatternAutotranslator(object):
         self._formula_re = re.compile(r"\$[^\$]+\$")
         self._img_re = get_image_regex()
         self._text = get_text_content_regex()
+        self.textTagMissingCounter = 0
 
     def translate(self, engl):
         # Normalize and filter out formulae with translatable text
@@ -99,6 +100,7 @@ class IFPatternAutotranslator(object):
                 translated = text_hit.group(1) + self.texttags[content] + text_hit.group(3)
                 texttag_replace[text_hit.group(0)] = translated
             else: # Untranslatable tag
+                self.textTagMissingCounter += 1
                 return None # Cant fully translate this string
         # Check if it matches
         if normalized not in self.ifpatterns:

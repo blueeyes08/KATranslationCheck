@@ -83,6 +83,11 @@ class IFPatternAutotranslator(object):
         self._img_re = get_image_regex()
         self._text = get_text_content_regex()
         self.textTagMissingCounter = 0
+        self.pattern_missing_tags = defaultdict(Counter) # key: ifpattern
+
+    def export_missing_tags(self, filename):
+        with open(filename, "w") as outfile:
+            json.dump(self.pattern_missing_tags, outfile, indent=4)
 
     def translate(self, engl):
         # Normalize and filter out formulae with translatable text
@@ -100,6 +105,7 @@ class IFPatternAutotranslator(object):
                 translated = text_hit.group(1) + self.texttags[content] + text_hit.group(3)
                 texttag_replace[text_hit.group(0)] = translated
             else: # Untranslatable tag
+                self.pattern_missing_tags[normalized][content] += 1
                 self.textTagMissingCounter += 1
                 return None # Cant fully translate this string
         # Check if it matches

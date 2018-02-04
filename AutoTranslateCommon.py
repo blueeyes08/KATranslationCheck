@@ -99,6 +99,7 @@ def to_xlsx(tags, filename):
     worksheet.write(0, 1, "Untranslated count")
     worksheet.write(0, 2, "English")
     worksheet.write(0, 3, "Translated")
+    worksheet.write(0, 4, "Translated is proofread")
 
     # Content
     for i, tag in enumerate(tags):
@@ -106,6 +107,8 @@ def to_xlsx(tags, filename):
         worksheet.write(i + 1, 1, tag["untranslated_count"])
         worksheet.write(i + 1, 2, tag["english"])
         worksheet.write(i + 1, 3, tag["translated"])
+        if "translation_is_proofread" in tag:
+            worksheet.write(i + 1, 4, tag["translation_is_proofread"])
 
     workbook.close()
 

@@ -262,12 +262,12 @@ def autotranslate_xliffs(args):
     # Export indexed
     if args.index:
         print("Exporting indices...")
-        text_tag_indexer.exportJSON(ignore_alltranslated)
-        text_tag_indexer.exportXLIFF(ignore_alltranslated)
-        text_tag_indexer.exportXLSX(ignore_alltranslated)
-        ignore_formula_pattern_idxer.exportJSON(ignore_alltranslated)
-        ignore_formula_pattern_idxer.exportXLSX(ignore_alltranslated)
-        ignore_formula_pattern_idxer.exportXLIFF(ignore_alltranslated)
+        text_tag_indexer.exportJSON(ignore_alltranslated, only_proofread_patterns=args.only_approved)
+        text_tag_indexer.exportXLIFF(ignore_alltranslated, only_proofread_patterns=args.only_approved)
+        text_tag_indexer.exportXLSX(ignore_alltranslated, only_proofread_patterns=args.only_approved)
+        ignore_formula_pattern_idxer.exportJSON(ignore_alltranslated, only_proofread_patterns=args.only_approved)
+        ignore_formula_pattern_idxer.exportXLSX(ignore_alltranslated, only_proofread_patterns=args.only_approved)
+        ignore_formula_pattern_idxer.exportXLIFF(ignore_alltranslated, only_proofread_patterns=args.only_approved)
         #pattern_indexer.exportCSV(os.path.join("output-" + args.language, "patterns.csv"))
     if "ifpattern_autotranslator" in locals() and ifpattern_autotranslator is not None:
         print("Could not translate {} strings due to missing text tags".format(

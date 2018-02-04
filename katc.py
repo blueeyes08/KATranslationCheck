@@ -32,6 +32,7 @@ if __name__ == "__main__":
     autotranslate.add_argument('-f', '--filter', nargs="*", action="append", help='Ignore file paths that do not contain this string, e.g. exercises or 2_high_priority. Can use multiple ones which are ANDed')
     autotranslate.add_argument('-i', '--index', action="store_true", help='Recognize and export patterns of different types')
     autotranslate.add_argument('-o', '--overwrite', action="store_true", help='Export suggestions where there is an existing (but not approved) suggestion')
+    autotranslate.add_argument('--only-approved', action="store_true", help='When indexing, only export patterns that have approved translations')
     autotranslate.add_argument('--index-ignore-translated', action="store_true", help='Ignore fully translated patterns')
     autotranslate.add_argument('--full-auto', action="store_true", help='Full-auto translation. USE SPARINGLY')
     autotranslate.add_argument('-l','--limit', type=int, default=1000000000, help='Number of string to translate using full auto mode')

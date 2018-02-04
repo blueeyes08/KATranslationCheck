@@ -38,7 +38,8 @@ class TextTagIndexer(object):
         self.lang = lang
         self.index = Counter() # TOTAL count for each text tag
         self.untranslated_index = Counter()
-        self.translated_index = defaultdict(Counter)
+        self.approved_index = defaultdict(Counter) # norm engl => translation => count ONLY for proofread versions
+        self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
         self._re = get_text_content_regex()
 
@@ -57,7 +58,10 @@ class TextTagIndexer(object):
                 self.index[engl_hit] += 1
                 # If untranslated, do not index translions
                 if transl_hit:
-                    self.translated_index[engl_hit][transl_hit] += 1
+                    if approved:
+                        self.approved_index[engl_hit][transl_hit] += 1
+                    else:
+                        self.translated_index[engl_hit][transl_hit] += 1
         else: # Not translated, just index to collect stats
             for engl_hit in engl_hits:
                 engl_hit = engl_hit.group(2).strip()
@@ -71,7 +75,7 @@ class TextTagIndexer(object):
     def __len__(self):
         return len(self.index)
 
-    def _convert_to_json(self, ignore_alltranslated=False):
+    def _convert_to_json(self, ignore_alltranslated=False, only_proofread_patterns=False):
         texttags = []
         # Sort by most untranslated
         for (hit, count) in self.untranslated_index.most_common():
@@ -80,13 +84,23 @@ class TextTagIndexer(object):
             if untransl_count == 0 and ignore_alltranslated:
                 continue
             # Get the most common translation for that tag
-            transl = "" if len(self.translated_index[hit]) == 0 \
-                else self.translated_index[hit].most_common(1)[0][0]
+            pattern_from_proofread = False
+            transl = ""
+            if len(self.approved_index[hit]) > 0:
+                transl = self.approved_index[hit].most_common(1)[0][0]
+                pattern_from_proofread = True
+            elif len(self.translated_index[hit]) > 0:
+                transl = self.translated_index[hit].most_common(1)[0][0]
+
+            if only_proofread_patterns and not pattern_from_proofread:
+                continue
+
             texttags.append({"english": hit,
                 "translated": transl, "count": total_count,
                 "untranslated_count": untransl_count,
                     "files": self.filename_index[hit],
-                "type": "texttag"})
+                "type": "texttag",
+                "translation_is_proofread": pattern_from_proofread})
         return texttags
 
     def preindex(self, *args, **kwargs):
@@ -95,8 +109,8 @@ class TextTagIndexer(object):
     def clean_preindex(self, *args, **kwargs):
         pass
 
-    def exportJSON(self, ignore_alltranslated=False):
-        texttags = self._convert_to_json(ignore_alltranslated)
+    def exportJSON(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         # Export main patterns file
         with open(transmap_filename(self.lang, "texttags"), "w") as outfile:
             json.dump(texttags, outfile, indent=4, sort_keys=True)
@@ -106,14 +120,14 @@ class TextTagIndexer(object):
             json.dump(list(filter(lambda p: not p["translated"], texttags)),
                 outfile, indent=4, sort_keys=True)
 
-    def exportXLIFF(self, ignore_alltranslated=False):
-        texttags = self._convert_to_json(ignore_alltranslated)
+    def exportXLIFF(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         soup = pattern_list_to_xliff(texttags)
         with open(transmap_filename(self.lang, "texttags", "xliff"), "w") as outfile:
             outfile.write(str(soup))
 
-    def exportXLSX(self, ignore_alltranslated=False):
-        texttags = self._convert_to_json(ignore_alltranslated)
+    def exportXLSX(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         filename = transmap_filename(self.lang, "texttags", "xlsx")
         to_xlsx(texttags, filename)
 
@@ -247,8 +261,8 @@ class IgnoreFormulaPatternIndexer(object):
         return ifpatterns
 
 
-    def exportJSON(self, ignore_alltranslated=False):
-        ifpatterns = self._convert_to_json(ignore_alltranslated)
+    def exportJSON(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        ifpatterns = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         # Export main patterns file
         with open(transmap_filename(self.lang, "ifpatterns"), "w") as outfile:
             json.dump(ifpatterns, outfile, indent=4, sort_keys=True)
@@ -258,14 +272,14 @@ class IgnoreFormulaPatternIndexer(object):
             json.dump(list(filter(lambda p: not p["translated"], ifpatterns)),
                 outfile, indent=4, sort_keys=True)
 
-    def exportXLIFF(self, ignore_alltranslated=False):
-        ifpatterns = self._convert_to_json(ignore_alltranslated)
+    def exportXLIFF(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        ifpatterns = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         soup = pattern_list_to_xliff(ifpatterns)
         with open(transmap_filename(self.lang, "ifpatterns", "xliff"), "w") as outfile:
             outfile.write(str(soup))
 
-    def exportXLSX(self, ignore_alltranslated=False):
-        iftags = self._convert_to_json(ignore_alltranslated)
+    def exportXLSX(self, ignore_alltranslated=False, only_proofread_patterns=False):
+        iftags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
         filename = transmap_filename(self.lang, "ifpatterns", "xlsx")
         to_xlsx(iftags, filename)
 

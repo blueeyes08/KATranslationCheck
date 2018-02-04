@@ -54,6 +54,9 @@ class TextTagIndexer(object):
                 # Extract corresponding hits
                 engl_hit = engl_hit.group(2).strip()
                 transl_hit = transl_hit.group(2).strip()
+                # Check for trivial number-only tags
+                if is_numeric_only(engl_hit):
+                    continue # Trivial, don't index
                 # Count
                 self.index[engl_hit] += 1
                 # If untranslated, do not index translions
@@ -65,6 +68,8 @@ class TextTagIndexer(object):
         else: # Not translated, just index to collect stats
             for engl_hit in engl_hits:
                 engl_hit = engl_hit.group(2).strip()
+                if is_numeric_only(engl_hit):
+                    continue # Trivial, don't index
                 self.index[engl_hit] += 1
                 self.untranslated_index[engl_hit] += 1
                 # Count occurrences in files

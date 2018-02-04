@@ -56,6 +56,13 @@ def read_texttag_index(lang):
     except FileNotFoundError:
         return {}
 
+import re
+_numeric_only_re = re.compile(r"^\d+(\.\d+)?$", re.UNICODE)
+def is_numeric_only(s):
+    if s is None:
+        return False
+    return _numeric_only_re.match(s) is not None
+
 def pattern_list_to_xliff(patterns):
     """
     Convert a JSON list to a XLIFF soup

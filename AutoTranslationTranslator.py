@@ -104,6 +104,10 @@ class IFPatternAutotranslator(object):
                 # Assemble the correct replacement string
                 translated = text_hit.group(1) + self.texttags[content] + text_hit.group(3)
                 texttag_replace[text_hit.group(0)] = translated
+            elif is_numeric_only(content):
+                # Trivial tag, treat as universal
+                translated = text_hit.group(0)
+                texttag_replace[translated] = translated
             else: # Untranslatable tag
                 self.pattern_missing_tags[normalized][content] += 1
                 self.textTagMissingCounter += 1

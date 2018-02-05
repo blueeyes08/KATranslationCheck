@@ -104,7 +104,7 @@ class TextTagIndexer(object):
             texttags.append({"english": hit,
                 "translated": transl, "count": total_count,
                 "untranslated_count": untransl_count,
-                    "files": self.filename_index[hit],
+                "files": self.filename_index[hit],
                 "type": "texttag",
                 "translation_is_proofread": pattern_from_proofread})
         print("Found {} text tags".format(len(texttags)))

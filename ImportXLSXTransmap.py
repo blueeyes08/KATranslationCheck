@@ -22,7 +22,7 @@ def get_transmap(filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-l','--language', help='The language')
+    parser.add_argument('-l','--language', required=True, help='The language')
     parser.add_argument('iftags', help='The IF tags XLSX file')
     parser.add_argument('texttags', help='The text tags XLSX file')
     args = parser.parse_args()

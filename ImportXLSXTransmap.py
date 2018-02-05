@@ -2,6 +2,8 @@
 from openpyxl import load_workbook
 import json
 import argparse
+import os
+from ansicolor import red, blue, green
 from AutoTranslateCommon import transmap_filename
 
 def get_transmap(filename):
@@ -25,19 +27,27 @@ if __name__ == "__main__":
     parser.add_argument('texttags', help='The text tags XLSX file')
     args = parser.parse_args()
 
-    iftags = get_transmap(args.iftags)
-    texttags = get_transmap(args.texttags)
-    print("Found {} iftags".format(len(iftags)))
-    print("Found {} text tags".format(len(texttags)))
+    if os.path.isfile(args.iftags):
+        iftags = get_transmap(args.iftags)
+        print("Found {} iftags".format(len(iftags)))
+        
+        iftagsFile = transmap_filename(args.language, "ifpatterns")
+        print("Exporting IF tags to {}".format(iftagsFile))
+        
+        with open(iftagsFile, "w") as outfile:
+            json.dump(iftags, outfile, indent=4, sort_keys=True)
+    else:
+        print(red("IFTags file doesn't exist, skipping...", bold=True))
 
-    iftagsFile = transmap_filename(args.language, "ifpatterns")
-    texttagsFile = transmap_filename(args.language, "texttags")
-    print("Exporting IF tags to {}".format(iftagsFile))
-    print("Exporting text tags to {}".format(texttagsFile))
+    if os.path.isfile(args.texttags):
+        texttags = get_transmap(args.texttags)
+        print("Found {} text tags".format(len(texttags)))
 
-    with open(iftagsFile, "w") as outfile:
-        json.dump(iftags, outfile, indent=4, sort_keys=True)
+        texttagsFile = transmap_filename(args.language, "texttags")
+        print("Exporting text tags to {}".format(texttagsFile))
 
-    with open(texttagsFile, "w") as outfile:
-        json.dump(texttags, outfile, indent=4, sort_keys=True)
+        with open(texttagsFile, "w") as outfile:
+            json.dump(texttags, outfile, indent=4, sort_keys=True)
+    else:
+        print(red("Texttags file doesn't exist, skipping...", bold=True))
     

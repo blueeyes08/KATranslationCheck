@@ -106,6 +106,7 @@ class TextTagIndexer(object):
                     "files": self.filename_index[hit],
                 "type": "texttag",
                 "translation_is_proofread": pattern_from_proofread})
+        print("Found {} text tags".format(len(texttags)))
         return texttags
 
     def preindex(self, *args, **kwargs):
@@ -155,6 +156,8 @@ class IgnoreFormulaPatternIndexer(object):
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
         self._formula_re = re.compile(r"\$[^\$]+\$")
+        self._end_invariant_re = get_end_invariant_regex()
+        #self._end_re
         self._img_re = get_image_regex()
         self._text = get_text_content_regex()
         self._transURLs = {} # Translation URL examples
@@ -166,6 +169,7 @@ class IgnoreFormulaPatternIndexer(object):
     def _normalize(self, engl):
         normalized_engl = self._formula_re.sub("§formula§", engl)
         normalized_engl = self._img_re.sub("§image§", normalized_engl)
+        normalized_engl = self._end_invariant_re.sub("", normalized_engl)
         return normalized_engl
 
     def preindex(self, engl, translated=None, filename=None, approved=False):
@@ -224,6 +228,7 @@ class IgnoreFormulaPatternIndexer(object):
         if translated is not None: # translated
             normalized_trans = self._formula_re.sub("§formula§", translated)
             normalized_trans = self._img_re.sub("§image§", normalized_trans)
+            normalized_trans = self._end_invariant_re.sub("", normalized_trans)
             if approved:
                 self.approved_index[normalized_engl][normalized_trans] += 1
             else:
@@ -263,6 +268,7 @@ class IgnoreFormulaPatternIndexer(object):
                     "files": self.filename_index[hit],
                     "type": "ifpattern",
                     "translation_is_proofread": pattern_from_proofread})
+        print("Found {} IF patterns".format(len(ifpatterns)))
         return ifpatterns
 
 
@@ -316,3 +322,13 @@ class GenericPatternIndexer(object):
             for (hit, count) in self.index.most_common():
                 transl = self.translated_index[hit] if hit in self.translated_index else ""
                 outfile.write("\"{}\",\"{}\",{}\n".format(hit,transl,count))
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('str', nargs=1, help='the string')
+    args = parser.parse_args()
+
+    idxer = IgnoreFormulaPatternIndexer("de")
+    print(idxer._normalize(args.str[0]))

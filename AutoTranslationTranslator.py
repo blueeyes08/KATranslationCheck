@@ -81,6 +81,7 @@ class IFPatternAutotranslator(object):
         # Compile regexes
         self._formula_re = re.compile(r"\$[^\$]+\$")
         self._img_re = get_image_regex()
+        self._end_invariant_re = get_end_invariant_regex()
         self._text = get_text_content_regex()
         self.textTagMissingCounter = 0
         self.pattern_missing_tags = defaultdict(Counter) # key: ifpattern
@@ -93,6 +94,9 @@ class IFPatternAutotranslator(object):
         # Normalize and filter out formulae with translatable text
         normalized = self._formula_re.sub("§formula§", engl)
         normalized = self._img_re.sub("§image§", normalized)
+        # Make end invariant and store end for later use
+        endStr = self._end_invariant_re.search(normalized).group(1)
+        normalized = self._end_invariant_re.sub("", normalized)
         # Mathrm is a rare alternative to \\text which is unhanled at the moment
         if "mathrm" in engl:
             return None
@@ -138,6 +142,9 @@ class IFPatternAutotranslator(object):
                     src, transl), bold=True))
                 return None
             transl = transl.replace(src, repl)
+        # Add end string
+        if endStr:
+            transl += endStr
         return transl
 
 

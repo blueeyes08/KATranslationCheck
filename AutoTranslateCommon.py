@@ -13,6 +13,10 @@ def get_text_regex():
     regex = r"(\\(text|mathrm|textit|textbf)\s*\{" + exc_clause + r")"
     return re.compile(regex)
 
+
+def get_end_invariant_regex():
+    return re.compile(r"(\s*(\\n|[\.\?,!]|\s+|\[\[☃\s+[a-z-]+\s*\d*\]\]))*$")
+
 def hash_string(s):
     m = hashlib.md5() 
     m.update(s.encode("utf-8"))

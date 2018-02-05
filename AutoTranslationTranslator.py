@@ -73,11 +73,12 @@ class IFPatternAutotranslator(object):
     """
     Ignore Formula pattern autotranslator
     """
-    def __init__(self, lang):
+    def __init__(self, lang, limit=100):
         self.lang = lang
         # Read patterns index
         self.ifpatterns = read_ifpattern_index(lang)
         self.texttags = read_texttag_index(lang)
+        self.limit = limit
         # Compile regexes
         self._formula_re = re.compile(r"\$[^\$]+\$")
         self._img_re = get_image_regex()
@@ -91,6 +92,8 @@ class IFPatternAutotranslator(object):
             json.dump(self.pattern_missing_tags, outfile, indent=4)
 
     def translate(self, engl):
+        if self.limit <= 0:
+            return None  # dont translate
         # Normalize and filter out formulae with translatable text
         normalized = self._formula_re.sub("§formula§", engl)
         normalized = self._img_re.sub("§image§", normalized)
@@ -145,6 +148,8 @@ class IFPatternAutotranslator(object):
         # Add end string
         if endStr:
             transl += endStr
+        # Reduce limit only after successful translation
+        self.limit -= 1
         return transl
 
 

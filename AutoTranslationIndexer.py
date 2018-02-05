@@ -228,13 +228,6 @@ class IgnoreFormulaPatternIndexer(object):
         h = hash_string(normalized_engl)
         if h not in self.preindex_set:
             return None
-        # Index pattern if it contains TRANSLATABLE text tags ONLY.
-        # The translation itself will be perfomed in the autotranslator,
-        # while the text tag content itself is indexed in the texttag indexer
-        for text_hit in self._text.finditer(engl):
-            content = text_hit.group(2).strip()
-            if content not in self.texttags: # Untranslatable tag
-                return # String not translatable, do not index
         # Count also if translated
         self.index[normalized_engl] += 1
         # Add example link

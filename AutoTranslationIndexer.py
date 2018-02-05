@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import cffi_re2 as re
+import time
 from collections import Counter, defaultdict
 from ansicolor import red
 from toolz.dicttoolz import valmap
@@ -157,6 +158,7 @@ class IgnoreFormulaPatternIndexer(object):
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
         self._formula_re = re.compile(r"\$[^\$]+\$")
         self._end_invariant_re = get_end_invariant_regex()
+        self._start_invariant_re = get_start_invariant_regex()
         #self._end_re
         self._img_re = get_image_regex()
         self._text = get_text_content_regex()
@@ -167,9 +169,16 @@ class IgnoreFormulaPatternIndexer(object):
         # Ignore specific whitelisted texts which are not translated
 
     def _normalize(self, engl):
+        #t0 = time.time()
         normalized_engl = self._formula_re.sub("§formula§", engl)
+        #t1 = time.time()
         normalized_engl = self._img_re.sub("§image§", normalized_engl)
+        #t2 = time.time()
         normalized_engl = self._end_invariant_re.sub("", normalized_engl)
+        #t3 = time.time()
+        normalized_engl = self._start_invariant_re.sub("", normalized_engl)
+        #t4 = time.time()
+        #print((t1 - t0), (t2 - t1), (t3 - t2), (t4 - t3))
         return normalized_engl
 
     def preindex(self, engl, translated=None, filename=None, approved=False):
@@ -177,11 +186,18 @@ class IgnoreFormulaPatternIndexer(object):
         Index
         Kind of similar to a bloom filter, but not strictly probabilistic
         (only regarding hash collision)
-        and also maintains an exact count of strings by
+        and also mainta ins an exact count of strings by
         """
+        #t0 = time.time()
         normalized_engl = self._normalize(engl)
+        #t1 = time.time()
         h = hash_string(normalized_engl)
+        #t2 = time.time()
         self.preindex_ctr[h] += 1
+        #t3 = time.time()
+        # Stats
+        #print((t1-t0), (t2-t1), (t3-t2))
+        #print(normalized_engl)
 
     def clean_preindex(self):
         """

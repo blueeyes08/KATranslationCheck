@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import re
+import cffi_re2 as re
 import json
 import os
 import xlsxwriter
@@ -15,7 +15,10 @@ def get_text_regex():
 
 
 def get_end_invariant_regex():
-    return re.compile(r"(\s*(\\n|[\.\?,!]|\s+|\[\[☃\s+[a-z-]+\s*\d*\]\]))*$")
+    return re.compile(r"(\\n|[\.\?,!]|\s+|\[\[☃\s+[a-z-]+\s*\d*\]\])*$", re.UNICODE)
+
+def get_start_invariant_regex():
+    return re.compile(r"^(>|\s+|-|\\n)*", re.UNICODE)
 
 def hash_string(s):
     m = hashlib.md5() 

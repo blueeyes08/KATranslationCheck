@@ -174,7 +174,7 @@ class IgnoreFormulaPatternIndexer(object):
         #t1 = time.time()
         normalized_engl = self._img_re.sub("§image§", normalized_engl)
         #t2 = time.time()
-        normalized_engl = self._end_invariant_re.sub("", normalized_engl)
+        normalized_engl = self._end_invariant_re.sub("", normalized_engl[::-1])[::-1]
         #t3 = time.time()
         normalized_engl = self._start_invariant_re.sub("", normalized_engl)
         #t4 = time.time()
@@ -242,9 +242,8 @@ class IgnoreFormulaPatternIndexer(object):
         #"{}#q={}".format(self.translationURLs[filename], to_crowdin_search_string(entry))
         # Track translation for majority selection later
         if translated is not None: # translated
-            normalized_trans = self._formula_re.sub("§formula§", translated)
-            normalized_trans = self._img_re.sub("§image§", normalized_trans)
-            normalized_trans = self._end_invariant_re.sub("", normalized_trans)
+            normalized_trans = self._normalize(translated)
+            # Add to index
             if approved:
                 self.approved_index[normalized_engl][normalized_trans] += 1
             else:

@@ -99,11 +99,12 @@ class IFPatternAutotranslator(object):
         normalized = self._formula_re.sub("§formula§", engl)
         normalized = self._img_re.sub("§image§", normalized)
         # Make start invariant and store end for later use
-        startStr = self._start_invariant_re.search(normalized).group(1)
+        startStr = self._start_invariant_re.search(normalized).group(1) or ""
         normalized = self._start_invariant_re.sub("", normalized)
-        # Make end invariant and store end for later use
-        endStr = self._end_invariant_re.search(normalized).group(1)
-        normalized = self._end_invariant_re.sub("", normalized)
+        # Make end invariant and store end for later use. Operation on reversed string
+        normalized = normalized[::-1]
+        endStr = (self._end_invariant_re.search(normalized).group(1) or "")[::-1]
+        normalized = self._end_invariant_re.sub("", normalized)[::-1]
         # Mathrm is a rare alternative to \\text which is unhanled at the moment
         if "mathrm" in engl:
             return None

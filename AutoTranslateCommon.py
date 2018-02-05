@@ -15,10 +15,11 @@ def get_text_regex():
 
 
 def get_end_invariant_regex():
-    return re.compile(r"(\\n|[\.\?,!]|\s+|\[\[☃\s+[a-z-]+\s*\d*\]\])*$", re.UNICODE)
+    # Apply to reversed string
+    return re.compile(r"^((n\\|[\.\?,!\s]+|\]\]\d*\s*[a-z-]+\s+☃\s*\[\[)*)\s*", re.UNICODE)
 
 def get_start_invariant_regex():
-    return re.compile(r"^(>|\s+|-|\\n)*", re.UNICODE)
+    return re.compile(r"^((>|\s+|-|\\n)*)\s*", re.UNICODE)
 
 def hash_string(s):
     m = hashlib.md5() 

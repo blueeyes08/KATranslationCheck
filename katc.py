@@ -31,6 +31,7 @@ if __name__ == "__main__":
     autotranslate.add_argument('-a', '--approve', action="store_true", help='For --upload, auto-approve the strings')
     autotranslate.add_argument('-f', '--filter', nargs="*", action="append", help='Ignore file paths that do not contain this string, e.g. exercises or 2_high_priority. Can use multiple ones which are ANDed')
     autotranslate.add_argument('-i', '--index', action="store_true", help='Recognize and export patterns of different types')
+    autotranslate.add_argument('-c', '--comma', action="store_true", help='Replace decimal dots by decimal comma')
     autotranslate.add_argument('-o', '--overwrite', action="store_true", help='Export suggestions where there is an existing (but not approved) suggestion')
     autotranslate.add_argument('--only-approved', action="store_true", help='When indexing, only export patterns that have approved translations')
     autotranslate.add_argument('--index-ignore-translated', action="store_true", help='Ignore fully translated patterns')

@@ -5,11 +5,13 @@ import os.path
 import os
 import sys
 import traceback
+from AutoTranslatePostproc import *
 from tqdm import tqdm
 from ansicolor import black, blue, green
 from UpdateAllFiles import *
 from XLIFFUpload import *
 import concurrent.futures
+from toolz.functoolz import identity
 import gc
 import bs4
 
@@ -55,7 +57,7 @@ def export_xliff_file(soup, filename):
     with open(filename, "w") as outfile:
         outfile.write(str(soup))
 
-def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=True, preindex=False, overwrite=False):
+def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=True, preindex=False, overwrite=False, postproc=identity):
     """
     Remove both untranslated and notes from the given soup.
     For the untranslated elements, in
@@ -124,7 +126,7 @@ def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=Tr
 
         # Now we can try to autotranslate
         try:
-            autotrans = autotranslator.translate(engl)
+            autotrans = postproc(autotranslator.translate(engl))
         except:
             print(black("Autotranslate fail for string '{}'".format(engl), bold=True))
             traceback.print_exception(*sys.exc_info())
@@ -157,9 +159,9 @@ def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=Tr
 
     return autotranslated_count
 
-def readAndProcessXLIFF(lang, filename, fileid, indexer, autotranslator, upload=False, approve=False, autotranslate=True, preindex=False, overwrite=False, fullauto_account=False):
+def readAndProcessXLIFF(lang, filename, fileid, indexer, autotranslator, upload=False, approve=False, autotranslate=True, preindex=False, overwrite=False, fullauto_account=False, postproc=identity):
     soup = parse_xliff_file(filename)
-    autotranslated_count = process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=autotranslate, preindex=preindex, overwrite=overwrite)
+    autotranslated_count = process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=autotranslate, preindex=preindex, overwrite=overwrite, postproc=postproc)
     # If we are not autotranslating, stop here, no need to export
     if not autotranslate:
         return 0
@@ -237,6 +239,10 @@ def autotranslate_xliffs(args):
     else: # Index, not autotranslate
         autotranslator = CompositeAutoTranslator()
 
+    postproc = identity
+    if args.comma:
+        postproc = decimal_comma_replace
+
     # Process in parallel
     # Cant use process pool as indexers currently cant be merged
     executor = concurrent.futures.ThreadPoolExecutor(args.num_processes)
@@ -247,13 +253,13 @@ def autotranslate_xliffs(args):
         # Two pass: First preindex then
         # See IgnoreFormulaPatternIndex for reason
         # 1st pass
-        run(executor, xliffs, lang=args.language, indexer=indexer, autotranslator=autotranslator, upload=args.upload, approve=args.approve, autotranslate=False, preindex=True, overwrite=args.overwrite, fullauto_account=args.full_auto)
+        run(executor, xliffs, lang=args.language, indexer=indexer, autotranslator=autotranslator, upload=args.upload, approve=args.approve, autotranslate=False, preindex=True, overwrite=args.overwrite, fullauto_account=args.full_auto, postproc=postproc)
         print("------------------------------")
         print("Preindex finished. Indexing run")
         print("------------------------------\n")
         indexer.clean_preindex()
         print()
-        run(executor, xliffs, lang=args.language, indexer=indexer, autotranslator=autotranslator, upload=args.upload, approve=args.approve, autotranslate=False, preindex=False, overwrite=args.overwrite, fullauto_account=args.full_auto)
+        run(executor, xliffs, lang=args.language, indexer=indexer, autotranslator=autotranslator, upload=args.upload, approve=args.approve, autotranslate=False, preindex=False, overwrite=args.overwrite, fullauto_account=args.full_auto, postproc=postproc)
     else: # translation run. Simple single pas
         autotranslated_count = run(executor, xliffs,
             lang=args.language, indexer=indexer, autotranslator=autotranslator, upload=args.upload, approve=args.approve, autotranslate=True, overwrite=args.overwrite, fullauto_account=args.full_auto)

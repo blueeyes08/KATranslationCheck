@@ -163,7 +163,7 @@ function renderKaTeX() {
           console.log("Orig text", txt);
           txt = txt.replace(/\s*\[\[☃\s+[a-z-]+\s*\d*\]\]\s*/g, '<span style="border-radius: 5px; border: 1px solid; padding: 1px 5px;">User input</span>');
           txt = txt.replace(/\\\\\\\\n/g, "┝");
-          txt = txt.replace(/\\\\(?=[a-zA-Z])/g, "\\")
+          txt = txt.replace(/\\\\(?=[a-zA-Z,])/g, "\\")
           txt = txt.replace(/┝/g, "\\\\\\");
           console.log("stage 1", txt)
           txt = txt .replace(/\\n(?![a-z])/g, "\\newline");

@@ -155,8 +155,7 @@ $(document).ready(function() {
     init();
 })
 
-
-$(document).ready(function() {
+function renderKaTeX() {
         console.log("foo")
         $(".perseus-text").each(function(idx) {
           
@@ -195,6 +194,8 @@ $(document).ready(function() {
           $(this).html(converter.makeHtml($(this).html()))
         });
       });
+}
+
 function nextString() {
     if(strings == null || strings.length == 0) {
         currentString = null;
@@ -203,6 +204,7 @@ function nextString() {
     }
     currentString = strings[0];
     $("#text").text(currentString.target);
+    renderKaTeX();
     strings = strings.slice(1);
     console.log(strings.length + " strings left");
 }

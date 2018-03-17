@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -5,7 +6,23 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.min.js" type="text/javascript"></script>
+</head>
+<title>Khantribute_</title>
     <style>
+    :root {
+    --header-height: 64px;
+    
+    /* COLORS */
+    --cerulean-blue: #066ee2; 
+    --textcolor: #5e5e5e;
+          }
+
+/*--body{
+    font-family: 'Proxima Nova', Georgia, sans-serif;
+        }
+*/
     #headline {color: #999;}
     #thumbUpBtn {
         background-color: #0fea00;
@@ -39,27 +56,41 @@
         color: red;
     }
     #skipAnimIcon {
-        color: blue;
+        color: #0D55DB;
     }
     #textRow {
         margin-top:25px;margin-bottom:100px; position:relative;
     }
     #statsContainer {
-        text-align:center; font-size: 200%;margin-bottom:15px;color:blue;
+        text-align:center; font-size: 200%;margin-bottom:15px;color:#0D55DB;
     }
     #skipSpan {
         color:blue;position:absolute;width:33%; text-align: center;left:33.3%;top:0;
     }
+    /* .white-space-pre {
+    white-space: pre-wrap;
+    <div class="white-space-pre"> Some test \n with linebreaks</div> 
+    */
+}
     </style>
+     <img src="http://kagame-sv.localgrid.de/khantributePage1Logo.svg" style="width:40%;height:40%;float:left;" > 
+    
 </head>
 
 <body>
+  
     <div class="container">
+      
         <div class="row">
+          <span style="color:#0D55DB;float:right;size:height:25px;width:25px" onclick="feedback()">
+                <i class="material-icons">feedback</i>
+                
+            </span>
             <div class="twelve columns" id="statsContainer">
                 <span id="count">0</span> rösta (#<span id="rank">?</span>)
             </div>
         </div>
+        
         <div class="row">
             <div id="headline" class="twelve columns">
                 <h3 style="text-align: center;">Är den här texten bra svenska?</h3>
@@ -79,6 +110,7 @@
                 <!--<i class="material-icons" onclick="skip()">arrow_downward</i>-->
             </span>
         </div>
+        
         <div class="row" id="textRow">
             <div id="animContainer">
                 <div style="position: relative">
@@ -87,11 +119,13 @@
                     <span class="material-icons animIcon" id="skipAnimIcon">skip_next</span>
                 </div>
             </div>
-            <h3 id="text"></h3>
+            
+            <h3 id="text" class="perseus-text"></h3>
+            
         </div>
     </div>
 
-    <!--<div class="container" style="position: fixed; bottom: 0; background-color: white;">
+<!--    <!--<div class="container" style="position: fixed; bottom: 0; background-color: white;">
         <div class="row">
             <button id="thumbUpBtn" class="button button-primary twelve columns" onclick="thumbUp()">
                 <i class="material-icons">thumb_up</i>
@@ -102,9 +136,13 @@
         </div>
     </div>-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js" integrity="sha256-HkMrKMLKQk4t1R2ofMAcLz72fWM2sshnx6215U+LgU0=" crossorigin="anonymous"></script>
     <script type="text/javascript">
 var cid = null;
 var currentString = null;
@@ -117,6 +155,46 @@ $(document).ready(function() {
     init();
 })
 
+
+$(document).ready(function() {
+        console.log("foo")
+        $(".perseus-text").each(function(idx) {
+          
+          var txt = $(this).text()
+          console.log("Orig text", txt);
+          txt = txt.replace(/\s*\[\[☃\s+[a-z-]+\s*\d*\]\]\s*/g, '<span style="border-radius: 5px; border: 1px solid; padding: 1px 5px;">User input</span>');
+          txt = txt.replace(/\\\\\\\\n/g, "┝");
+          txt = txt.replace(/\\\\(?=[a-zA-Z])/g, "\\")
+          txt = txt.replace(/┝/g, "\\\\\\");
+          console.log("stage 1", txt)
+          txt = txt .replace(/\\n(?![a-z])/g, "\\newline");
+          console.log("stage 2", txt)
+          txt = txt.replace(/\{align\}/g,"{aligned}");
+          
+          $(this).html(txt);
+          console.log("New txt", txt);
+          // Render
+          renderMathInElement(this, {
+            delimiters: [
+             {
+                left: "$$",
+                right: "$$",
+                display: true
+              }, //REMEMBER: The order of these two lines is important
+               {
+                left: "$",
+                right: "$",
+                display: false
+              },
+            ]
+          });
+          // Convert leftover \newline
+          $(this).html($(this).html().replace(/\\newline/g, "<br/>"));
+          // Convert markdown
+          var converter = new showdown.Converter();
+          $(this).html(converter.makeHtml($(this).html()))
+        });
+      });
 function nextString() {
     if(strings == null || strings.length == 0) {
         currentString = null;
@@ -128,7 +206,6 @@ function nextString() {
     strings = strings.slice(1);
     console.log(strings.length + " strings left");
 }
-
 function init() {
     if(Cookies.get("kaid") === undefined) {
         cid = ("" + Math.random()).slice(2) // long number
@@ -216,7 +293,16 @@ function skip() {
     submit(0);
     nextString();
 }
-
+function feedback() {
+  //window.open('mailto:test@example.com?subject=subject&body=body');
+    var recipient="khanacademysverige";
+    var at = String.fromCharCode(64);
+    var dotcom="gmail.com";
+    var msub="?subject=My Khantribute feedback:"
+    var mbod="&body= Hi Khantribute People,"
+    var mail="mailto:";
+    window.open(mail+recipient+at+dotcom+msub+mbod);
+}
 
 function fetchStrings() {
     $.getJSON("/api/strings?offset=" + count, function(data) {

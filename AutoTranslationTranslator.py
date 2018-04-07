@@ -64,7 +64,7 @@ class RuleAutotranslator(object):
         #if is_perseus_img_url or is_formula_plus_img:
         #    return None
 
-        if is_perseus_img_url or is_formula_plus_img or is_input or is_formula_plus_input or is_simple_coordinate:
+        if (is_perseus_img_url or is_formula_plus_img or is_input or is_formula_plus_input or is_simple_coordinate) and not contains_text:
             return engl
         if is_formula and not contains_text:
             return engl

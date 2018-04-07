@@ -15,13 +15,13 @@ from toolz.functoolz import identity
 import gc
 import bs4
 
-def findXLIFFFiles(directory, filt=[]):
+def findXLIFFFiles(directory, filt=[], lang="de"):
     """
     Get a list of PO files (.po / .pot) which are present in the directory.
 
     filter is a nested list from argparse which defined
     """
-    transFilemap = getTranslationFilemapCache()
+    transFilemap = getTranslationFilemapCache(lang)
     if os.path.isfile(directory): #Single file>=
         poFilenames = [directory]
     else:
@@ -247,7 +247,7 @@ def autotranslate_xliffs(args):
     # Cant use process pool as indexers currently cant be merged
     executor = concurrent.futures.ThreadPoolExecutor(args.num_processes)
 
-    xliffs = findXLIFFFiles("cache/{}".format(args.language), filt=args.filter)
+    xliffs = findXLIFFFiles("cache/{}".format(args.language), filt=args.filter, lang=args.language)
 
     if args.index:
         # Two pass: First preindex then

@@ -586,7 +586,7 @@ class FullAutoTranslator(object):
         #    return None
         if not self.check_regex_equal(self._asterisk_re, engl, txt2, "asterisk"):
             return None
-        if not self.check_regex_equal(self._entity_re, engl, txt2, "enttiy"):
+        if not self.check_regex_equal(self._entity_re, engl, txt2, "entity"):
             return None
         if not self.check_regex_equal(self._newline_re, engl, txt2, "newline"):
             return None

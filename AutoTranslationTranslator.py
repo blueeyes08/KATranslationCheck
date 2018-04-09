@@ -290,7 +290,7 @@ PlaceholderInfo = namedtuple("PlaceholderInfo", [
 
 class FullAutoTranslator(object):
     """
-    Google translate based full auto translator
+    Web service translate based full auto translator
     """
     def __init__(self, lang, limit=25):
         self.translator = TranslationDriver(lang.partition("-")[0])
@@ -363,7 +363,7 @@ class FullAutoTranslator(object):
                 ws_before = self._start_whitespace_re.match(subgroup).group(0)
                 ws_after = self._end_whitespace_re.match(subgroup).group(0)
                 # Subtranslate. Strip whitespaces to re-insert the correct amount later
-                trans = self.google_translate(subgroup).strip()
+                trans = self.translator.translate(subgroup).strip()
                 trans = "{}{}{}".format(ws_before, trans, ws_after)
                 formula = formula.replace(subgroup, trans)
                 #print("Subgroup translation: {} --> {}".format(match.group(0), formula))

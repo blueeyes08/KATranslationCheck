@@ -22,7 +22,13 @@ class TranslationDriver(object):
     def _googleapi_translate(self, txt):
         transObj = self.client.translate(txt)
         try:
-            return transObj["translatedText"]
+            trans = transObj["translatedText"]
+            # Fix quote entity issues
+            trans = trans.replace("&gt;", ">")
+            trans = trans.replace("&lt;", "<")
+            trans = trans.replace("&quot;", "\"")
+            trans = trans.replace("&amp;", "&")
+            return trans
         except:
             print(red("Translation failed: "), transObj)
             return None

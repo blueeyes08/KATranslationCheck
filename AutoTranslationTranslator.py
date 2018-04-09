@@ -307,6 +307,7 @@ class FullAutoTranslator(object):
         self._underscore_re = re.compile(r"\s*_+\s*")
         self._special_chars_re = re.compile(r"\s*[θ𝘹𝘺ƒ𝘢𝘣𝘶𝘯𝘥𝘬𝘍𝑥𝑦𝑚𝑏𝑒𝑟𝑔𝑡𝜇—≠ⁿˣ⋅􀀀]+\s*") # translate will fail for these
         self._hash_re = re.compile(r"\s*#+\s*")
+        self._times_re = re.compile(r"\s*\\\\times\s*") # might occur in text
         self._table_empty_re = re.compile(r"\s*:-:\s*")
         self._newline_re = re.compile(r"\s*(\\n)+\s*")
         self._index_placeholder_re = re.compile(r"\s*§(image|formula)§\s*")
@@ -363,7 +364,8 @@ class FullAutoTranslator(object):
                 ws_before = self._start_whitespace_re.match(subgroup).group(0)
                 ws_after = self._end_whitespace_re.match(subgroup).group(0)
                 # Subtranslate. Strip whitespaces to re-insert the correct amount later
-                trans = self.translator.translate(subgroup).strip()
+                print(subgroup)
+                trans = self.translate(subgroup).strip()
                 trans = "{}{}{}".format(ws_before, trans, ws_after)
                 formula = formula.replace(subgroup, trans)
                 #print("Subgroup translation: {} --> {}".format(match.group(0), formula))
@@ -466,6 +468,7 @@ class FullAutoTranslator(object):
         s, asteriskMap, n = self.placeholder_replace(s, n, self._asterisk_re)
         s, underscoreMap, n = self.placeholder_replace(s, n, self._underscore_re)
         s, hashMap, n = self.placeholder_replace(s, n, self._hash_re)
+        s, timesMap, n = self.placeholder_replace(s, n, self._times_re)
         s, newlineMap, n = self.placeholder_replace(s, n, self._newline_re)
         s, inputMap, n = self.placeholder_replace(s, n, self._input_re)
         s, imgMap, n = self.placeholder_replace(s, n, self._image_re)
@@ -486,6 +489,7 @@ class FullAutoTranslator(object):
             formulaMap.items(),
             asteriskMap.items(),
             hashMap.items(),
+            timesMap.items(),
             newlineMap.items(),
             inputMap.items(),
             imgMap.items(),

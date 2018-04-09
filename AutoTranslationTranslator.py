@@ -8,7 +8,7 @@ import itertools
 import random
 from toolz.dicttoolz import merge
 from AutoTranslateCommon import *
-from googletrans import Translator
+from TranslationDriver import *
 
 class CompositeAutoTranslator(object):
     """
@@ -293,6 +293,7 @@ class FullAutoTranslator(object):
     Google translate based full auto translator
     """
     def __init__(self, lang, limit=25):
+        self.translator = TranslationDriver(lang.partition("-")[0])
         self.lang = lang if lang != "lol" else "de" # LOL => translate to DE
         # Generate nonce to fix some bad translations
         self.nonce1 = random.randint(1000000, 9999999)
@@ -534,15 +535,6 @@ class FullAutoTranslator(object):
 
         return s
 
-    def google_translate(self, txt):
-        translator = Translator()
-        #translate_client = translate.Client()
-        #translation = translate_client.translate( txt, target_language=lang)
-        #return translation['translatedText']
-        # partition: sv-SE => sv
-        result = translator.translate(txt, src="en", dest=self.lang.partition("-")[0])
-        return result.text
-
     def check_regex_equal(self, regex, s1, s2, desc):
         m1 = [m.group(0).strip() for m in regex.finditer(s1)]
         m2 = [m.group(0).strip() for m in regex.finditer(s2)]
@@ -574,7 +566,7 @@ class FullAutoTranslator(object):
         # Do actual preprocessing with possible subtranslation
         engl_proc, info = self.preproc(engl, subtranslate=True)
         # Perform translation
-        translated = self.google_translate(engl_proc)
+        translated = self.translator.translate(engl_proc)
         # Back-replace placeholders
         txt2 = self.postproc(engl, translated, info)
         # Emit debug data

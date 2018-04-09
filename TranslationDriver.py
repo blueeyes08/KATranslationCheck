@@ -22,9 +22,9 @@ class TranslationDriver(object):
     def _googleapi_translate(self, txt):
         transObj = self.client.translate(txt)
         try:
-            return transObj.translatedText
+            return transObj["translatedText"]
         except:
-            print(red("Translation failed: "), red(transObj))
+            print(red("Translation failed: "), transObj)
             return None
         
     def _googletrans_translate(self, txt):

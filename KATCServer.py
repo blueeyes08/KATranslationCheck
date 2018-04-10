@@ -9,16 +9,18 @@ def index():
 
 @route('/apiv2/patterns/<lang>')
 def patterns(lang):
+    length = request.query.length or 500
     with open(transmap_filename(lang, "ifpatterns")) as infile:
         data = json.load(infile)
     response.content_type = 'application/json'
-    return json.dumps(data)
+    return json.dumps(data[:length])
 
 @route('/apiv2/texttags/<lang>')
 def patterns(lang):
+    length = request.query.length or 500
     with open(transmap_filename(lang, "texttags")) as infile:
         data = json.load(infile)
     response.content_type = 'application/json'
-    return json.dumps(data)
+    return json.dumps(data[:length])
 
 run(host='localhost', port=9921)

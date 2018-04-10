@@ -9,11 +9,12 @@ import { PatternEditorComponent } from './pattern-editor/pattern-editor.componen
 import { SingleTexttagEditorComponent } from './single-texttag-editor/single-texttag-editor.component';
 import { SinglePatternEditorComponent } from './single-pattern-editor/single-pattern-editor.component';
 import { ToolsComponent } from './tools/tools.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
   declarations: [AppComponent, TexttagEditorComponent, PatternEditorComponent, SingleTexttagEditorComponent, SinglePatternEditorComponent, ToolsComponent],
-  imports: [BrowserModule, MatToolbarModule, MatIconModule, MatButtonModule, AppRoutingModule],
+  imports: [BrowserModule, MatToolbarModule, MatIconModule, MatButtonModule, AppRoutingModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent]
 })

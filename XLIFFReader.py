@@ -10,6 +10,7 @@ from tqdm import tqdm
 from ansicolor import black, blue, green
 from UpdateAllFiles import *
 from XLIFFUpload import *
+from XLIFFUtils import *
 import concurrent.futures
 from toolz.functoolz import identity
 import gc
@@ -17,7 +18,7 @@ import bs4
 
 def findXLIFFFiles(directory, filt=[], lang="de"):
     """
-    Get a list of PO files (.po / .pot) which are present in the directory.
+    Get a list of XLIFF files (.xliff) which are present in the directory.
 
     filter is a nested list from argparse which defined
     """
@@ -48,10 +49,6 @@ def findXLIFFFiles(directory, filt=[], lang="de"):
                     else:
                         print(red("Can't find {} in filemap - ignoring file".format(key), bold=True))
     return xliffFiles
-
-def parse_xliff_file(filename):
-    with open(filename) as infile:
-        return BeautifulSoup(infile, "lxml-xml")
 
 def export_xliff_file(soup, filename):
     with open(filename, "w") as outfile:
@@ -155,7 +152,6 @@ def process_xliff_soup(filename, soup, autotranslator, indexer, autotranslate=Tr
         print(black("{} {} strings in {}".format(
             "Preindexed" if preindex else "Indexed",
             overall_count, os.path.basename(filename))))
-
 
     return autotranslated_count
 

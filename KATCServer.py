@@ -14,12 +14,13 @@ def patterns(lang):
     response.content_type = 'application/json'
     return json.dumps(data[:200])
 
-
 @route('/apiv2/texttags/<lang>')
 def patterns(lang):
     with open(transmap_filename(lang, "texttags")) as infile:
         data = json.load(infile)
     response.content_type = 'application/json'
     return json.dumps(data[:200])
+
+
 
 run(host='localhost', port=9921)

@@ -1,0 +1,11 @@
+[Unit]
+Description=KATranslationCheck server
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 KATCServer.py
+WorkingDirectory=/mnt/production/KATranslationCheck
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

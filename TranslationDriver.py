@@ -28,6 +28,7 @@ class TranslationDriver(object):
             trans = trans.replace("&lt;", "<")
             trans = trans.replace("&quot;", "\"")
             trans = trans.replace("&amp;", "&")
+            trans = trans.replace("&#39;", "'")
             return trans
         except:
             print(red("Translation failed: "), transObj)

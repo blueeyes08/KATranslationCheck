@@ -364,7 +364,6 @@ class FullAutoTranslator(object):
                 ws_before = self._start_whitespace_re.match(subgroup).group(0)
                 ws_after = self._end_whitespace_re.match(subgroup).group(0)
                 # Subtranslate. Strip whitespaces to re-insert the correct amount later
-                print(subgroup)
                 trans = self.translate(subgroup).strip()
                 trans = "{}{}{}".format(ws_before, trans, ws_after)
                 formula = formula.replace(subgroup, trans)

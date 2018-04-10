@@ -1,31 +1,18 @@
 <mat-toolbar color="primary" id="mainToolbar">
-  <span>RecallDB</span>
-  <!-- Recalls -->
-  <a mat-button onclick="window.history.back()" style="margin-left: 25px;">
-    <mat-icon>chevron_left</mat-icon>
-    Zurück
-  </a>
-
-  <span *ngIf="sessionObs | async as session">
+  <span>KATE</span>
     <!-- Recalls -->
-    <a mat-button [routerLink]="['/recalls']" style="margin-left: 25px;">
+    <a mat-button [routerLink]="['/texttags']" style="margin-left: 25px;">
       <mat-icon>drive_eta</mat-icon>
-      Rückrufe
+      Texttags
     </a>
 
-    <a mat-button [routerLink]="['/analysis']">
+    <a mat-button [routerLink]="['/patterns']">
       <mat-icon>insert_chart</mat-icon>
-      Analysen
+      Patterns
     </a>
-
-    <a mat-button [routerLink]="['/account']">
-      <mat-icon>account_circle</mat-icon>
-      Benutzer
-    </a>
-
-    <a mat-button [routerLink]="['/admin']" *ngIf="session.roles.includes('admin')">
+    
+    <a mat-button [routerLink]="['/tools']">
       <mat-icon>settings</mat-icon>
-      Administratorbereich
+      Tools
     </a>
-  </span>
 </mat-toolbar>

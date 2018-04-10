@@ -8,11 +8,12 @@ import { TexttagEditorComponent } from './texttag-editor/texttag-editor.componen
 import { PatternEditorComponent } from './pattern-editor/pattern-editor.component';
 import { SingleTexttagEditorComponent } from './single-texttag-editor/single-texttag-editor.component';
 import { SinglePatternEditorComponent } from './single-pattern-editor/single-pattern-editor.component';
+import { ToolsComponent } from './tools/tools.component';
 
 
 @NgModule({
-  declarations: [AppComponent, TexttagEditorComponent, PatternEditorComponent, SingleTexttagEditorComponent, SinglePatternEditorComponent],
-  imports: [BrowserModule, MatToolbarModule, MatIconModule, AppRoutingModule],
+  declarations: [AppComponent, TexttagEditorComponent, PatternEditorComponent, SingleTexttagEditorComponent, SinglePatternEditorComponent, ToolsComponent],
+  imports: [BrowserModule, MatToolbarModule, MatIconModule, MatButtonModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent]
 })

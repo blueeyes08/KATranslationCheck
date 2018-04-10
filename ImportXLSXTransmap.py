@@ -11,8 +11,8 @@ def get_transmap(filename):
     sheet = wb[wb.sheetnames[0]]
     tmap = {}
     for row in sheet.rows:
-        engl = row[0]
-        transl = row[1]
+        engl = row[2]
+        transl = row[3]
         if transl.value is None:
             continue
         print(engl.value,"==>",transl.value)

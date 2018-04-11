@@ -40,6 +40,10 @@ def read_patterns(lang, identifier):
     with open(transmap_filename(lang, identifier)) as infile:
         return json.load(infile)
 
+def save_patterns(lang, identifier, patterns):
+    with open(transmap_filename(lang, identifier), "w") as outfile:
+        json.dump(patterns, outfile)
+
 def read_ifpattern_index(lang):
     try:
         ifpatterns = read_patterns(lang, "ifpatterns")

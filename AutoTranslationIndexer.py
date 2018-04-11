@@ -38,7 +38,8 @@ class TextTagIndexer(object):
     def __init__(self, lang):
         self.lang = lang
         self.index = Counter() # TOTAL count for each text tag
-        self.untranslated_index = Counter()
+        self.untranslated_count = Counter()
+        self.unapproved_count = Counter()
         self.approved_index = defaultdict(Counter) # norm engl => translation => count ONLY for proofread versions
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
@@ -72,7 +73,8 @@ class TextTagIndexer(object):
                 if is_numeric_only(engl_hit):
                     continue # Trivial, don't index
                 self.index[engl_hit] += 1
-                self.untranslated_index[engl_hit] += 1
+                self.untranslated_count[engl_hit] += 1
+                self.unapproved_count[engl_hit] += 1
                 # Count occurrences in files
                 self.filename_index[engl_hit][filename] += 1
         #except Exception as ex:
@@ -84,9 +86,10 @@ class TextTagIndexer(object):
     def _convert_to_json(self, ignore_alltranslated=False, only_proofread_patterns=False):
         texttags = []
         # Sort by most untranslated
-        for (hit, count) in self.untranslated_index.most_common():
+        for (hit, count) in self.untranslated_count.most_common():
             total_count = self.index[hit]
-            untransl_count = self.untranslated_index[hit]
+            untransl_count = self.untranslated_count[hit]
+            unapproved_count = self.unapproved_count[hit]
             if untransl_count == 0 and ignore_alltranslated:
                 continue
             # Get the most common translation for that tag
@@ -152,7 +155,8 @@ class IgnoreFormulaPatternIndexer(object):
         self.preindex_set = set() # Compiled from preindex_ctr in clean_preindex()
         self.ignore_translation_state = ignore_translation_state
         self.index = Counter() # norm engl => count
-        self.untranslated_index = Counter() # norm engl => count
+        self.untranslated_count = Counter() # norm engl => count
+        self.unapproved_count = Counter() # norm engl => count
         self.approved_index = defaultdict(Counter) # norm engl => translation => count ONLY for proofread versions
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
@@ -241,20 +245,24 @@ class IgnoreFormulaPatternIndexer(object):
                 self.approved_index[normalized_engl][normalized_trans] += 1
             else:
                 self.translated_index[normalized_engl][normalized_trans] += 1
+                self.unapproved_count[normalized_engl] += 1
             # If options is set, index translated just like untranslated
             if self.ignore_translation_state and not approved:
-                self.untranslated_index[normalized_engl] += 1
+                self.untranslated_count[normalized_engl] += 1
+                self.unapproved_count[normalized_engl] += 1
                 self.filename_index[normalized_engl][filename] += 1
         else: # untranslated
-            self.untranslated_index[normalized_engl] += 1
+            self.untranslated_count[normalized_engl] += 1
+            self.unapproved_count[normalized_engl] += 1
             self.filename_index[normalized_engl][filename] += 1
 
     def _convert_to_json(self, ignore_alltranslated=False, only_proofread_patterns=False):
         ifpatterns = []
         # Sort by most untranslated
-        for (hit, count) in self.untranslated_index.most_common():
+        for (hit, count) in self.untranslated_count.most_common():
             total_count = self.index[hit]
-            untransl_count = self.untranslated_index[hit]
+            untransl_count = self.untranslated_count[hit]
+            unapproved_count = self.unapproved_count[hit]
             if untransl_count == 0 and ignore_alltranslated:
                 continue
             # Get the most common pattern. Try proofread pattern first
@@ -273,6 +281,7 @@ class IgnoreFormulaPatternIndexer(object):
                 ifpatterns.append({"english": hit,
                     "translated": transl, "count": total_count,
                     "untranslated_count": untransl_count,
+                    "unapproved_count": unapproved_count,
                     "files": self.filename_index[hit],
                     "type": "ifpattern",
                     "translation_is_proofread": pattern_from_proofread})

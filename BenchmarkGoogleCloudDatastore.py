@@ -14,6 +14,7 @@ def write_string(sref):
 
 s1 = {
     "id": 123,
+    "lang": "sv-SE",
     "source": "$1$",
     "target": "$1$",
     "pattern": "$formula$",

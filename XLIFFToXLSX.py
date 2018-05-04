@@ -41,7 +41,7 @@ def namedtuples_to_xlsx(filename, values):
         return xlsx_write_rows(filename, [])
 
 
-XLIFFEntry = namedtuple("XLIFFEntry", ["ID", "Source", "Translated"])
+XLIFFEntry = namedtuple("XLIFFEntry", ["ID", "Source", "Translated", "IsTranslated", "IsApproved"])
 
 def process_xliff_soup(soup):
     """
@@ -83,7 +83,7 @@ def process_xliff_soup(soup):
             "approved" in trans_unit.attrs and trans_unit["approved"] == "yes")
 
         if not is_approved:
-            yield XLIFFEntry(trans_id, source.text, target.text)
+            yield XLIFFEntry(trans_id, source.text, target.text, not is_untranslated, is_approved)
 
 
 def convertXLIFFToXLSX(src, target):

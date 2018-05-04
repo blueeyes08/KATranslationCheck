@@ -16,6 +16,7 @@ def index(lang):
     query = client.query(kind='String')
     query.add_filter('lang', '=', lang)
     query.distinct_on = ['ifpattern']
+    query.projection = ['ifpattern']
     query_iter = query.fetch()
     for result in query_iter:
         print(result)

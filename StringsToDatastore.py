@@ -4,16 +4,19 @@ from collections import namedtuple
 import time
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
+from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 client = datastore.Client(project="watts-198422")
+
+executor = ThreadPoolExecutor(128)
+
 # Create & store an entity
-def write_entry(entry):
-    key = client.key('String', "{}-{}".format(entry["lang"], entry["id"]))
+def write_entry(obj):
+    key = client.key('String', "{}-{}".format(obj["lang"], obj["id"]))
     entity = datastore.Entity(key)
-    entity.update(entry)
-    # Save
+    entity.update(obj)
     client.put(entity)
 
 def export_lang_to_db(lang):
@@ -33,7 +36,8 @@ def export_lang_to_db(lang):
                 "translation_source": "Crowdin",
                 "ifpattern": ifIndexer._normalize(entry.Source)
             }
-            write_entry(entry)
+            # Async write
+            executor.submit(write_entry, obj)
             # Stats
             count += 1
             if count % 1000 == 0:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from google.cloud import datastore
 from collections import namedtuple
+import time
 client = datastore.Client(project="watts-198422")
 
 # Create & store an entity
@@ -41,5 +42,10 @@ s2 = {
     "state": "untranslated",
     "file": "learn.drafts.xliff"
 }
-add_string_to_pattern("$formula$", s1)
-add_string_to_pattern("$formula$", s2)
+
+t0 = time.time()
+for i in range(1000):
+    s1["id"] = i;
+    add_string_to_pattern("$formula$", s1)
+t1 = time.time()
+print((t1 - t0))

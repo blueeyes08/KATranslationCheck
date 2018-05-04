@@ -7,7 +7,7 @@ client = datastore.Client(project="watts-198422")
 # Create & store an entity
 def write_string(sref):
     key = client.key('String', "{}-{}".format(sref["lang"], sref["id"]))
-    entity = client.get(key)
+    entity = datastore.Entity(key)
     entity.update(sref)
     # Save
     client.put(entity)

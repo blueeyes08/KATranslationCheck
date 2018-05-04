@@ -25,8 +25,9 @@ def export_lang_to_db(lang):
     for file in findXLIFFFiles("cache/{}".format(lang)):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
+        print(black(file, bold=True))
         soup = parse_xliff_file(file)
-        for entry in process_xliff_soup(soup):
+        for entry in process_xliff_soup(soup, also_approved=True):
             obj = {
                 "id": entry.ID,
                 "source": entry.Source,

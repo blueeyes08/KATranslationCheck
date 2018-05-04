@@ -34,7 +34,8 @@ def export_lang_to_db(lang):
                 "is_approved": entry.IsApproved,
                 "lang": lang,
                 "translation_source": "Crowdin",
-                "ifpattern": ifIndexer._normalize(entry.Source)
+                "ifpattern": ifIndexer._normalize(entry.Source),
+                "file": ""
             }
             # Async write
             executor.submit(write_entry, obj)

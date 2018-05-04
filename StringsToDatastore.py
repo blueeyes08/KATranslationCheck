@@ -10,7 +10,7 @@ from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 client = datastore.Client(project="watts-198422")
 
-executor = ThreadPoolExecutor(128)
+executor = ThreadPoolExecutor(512)
 
 # Create & store an entity
 def write_entry(obj):
@@ -23,7 +23,8 @@ def export_lang_to_db(lang):
     count = 0
     ifIndexer = IgnoreFormulaPatternIndexer(lang)
     for file in findXLIFFFiles("cache/{}".format(lang)):
-        print(black(file, bold=True))
+        # e.g. '1_high_priority_platform/about.donate.xliff'
+        canonicalFilename = "/".join(file.split("/")[2:])
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup):
             obj = {
@@ -35,7 +36,7 @@ def export_lang_to_db(lang):
                 "lang": lang,
                 "translation_source": "Crowdin",
                 "ifpattern": ifIndexer._normalize(entry.Source),
-                "file": ""
+                "file": canonicalFilename
             }
             # Async write
             executor.submit(write_entry, obj)

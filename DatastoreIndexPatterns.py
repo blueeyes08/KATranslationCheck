@@ -38,7 +38,6 @@ def index_pattern(lang, pattern):
             patternInfo["translated"].append(result.key.id)
         else:
             patternInfo["untranslated"].append(result.key.id)
-    print(patternInfo)
     # Complete stats
     patternInfo["num_approved"] = len(patternInfo["approved"])
     patternInfo["num_translated"] = len(patternInfo["translated"])

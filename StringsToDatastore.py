@@ -20,10 +20,10 @@ def write_entry(obj, lang):
     entity.update(obj)
     client.put(entity)
 
-def export_lang_to_db(lang):
+def export_lang_to_db(lang, filt):
     count = 0
     ifIndexer = IgnoreFormulaPatternIndexer(lang)
-    for file in findXLIFFFiles("cache/{}".format(lang)):
+    for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
         print(black(file, bold=True))
@@ -50,7 +50,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', help='The crowdin lang code')
+    parser.add_argument('-f', '--filter', nargs="*", action="append", help='Ignore file paths that do not contain this string, e.g. exercises or 2_high_priority. Can use multiple ones which are ANDed')
     args = parser.parse_args()
 
-    export_lang_to_db(args.lang)
+    export_lang_to_db(args.lang, args.filter)
 

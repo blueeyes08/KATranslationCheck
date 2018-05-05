@@ -21,7 +21,6 @@ def delete_all(lang, kind):
     count = 0
     futures = []
     for result in query_iter:
-        print(result.key)
         executor.submit(client.delete, result.key)
     print("Deleted {} {}s".format(count, kind))
 

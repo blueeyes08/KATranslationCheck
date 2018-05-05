@@ -14,17 +14,6 @@ client = datastore.Client(project="watts-198422")
 
 executor = ThreadPoolExecutor(512)
 
-def findCommonPatterns(lang, orderBy='num_untranslated'):
-    query = client.query(kind='Pattern', namespace=lang)
-    query.add_filter('num_untranslated', '>', 0)
-    query.order = ['-' + orderBy]
-    query_iter = query.fetch(100)
-    count = 0
-    futures = []
-    for result in query_iter:
-        count += 1
-        print(result)
-
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()

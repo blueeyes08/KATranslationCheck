@@ -33,11 +33,12 @@ def index_pattern(lang, pattern):
     # ... and add them to the list
     for result in query_iter:
         if result["is_approved"]:
-            patternInfo["approved"].append(result.key.id_or_name)
+            patternInfo["approved"].append(result.key.id)
         elif result["is_translated"]:
-            patternInfo["translated"].append(result.key.id_or_name)
+            patternInfo["translated"].append(result.key.id)
         else:
-            patternInfo["untranslated"].append(result.key.id_or_name)
+            patternInfo["untranslated"].append(result.key.id)
+    print(patternInfo)
     # Complete stats
     patternInfo["num_approved"] = len(patternInfo["approved"])
     patternInfo["num_translated"] = len(patternInfo["translated"])

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import cffi_re2 as re
 import time
 from collections import Counter, defaultdict

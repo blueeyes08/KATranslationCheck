@@ -28,6 +28,7 @@ def delete_all(lang, kind):
     count = 0
     futures = []
     for result in query_iter:
+        count += 1
         futures.append(executor.submit(delete, result.key))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):

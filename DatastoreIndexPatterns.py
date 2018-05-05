@@ -15,7 +15,7 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 
 def index_pattern(lang, pattern):
-    key = client.key('Pattern', "{}-{}".format(lang, pattern))
+    key = client.key('Pattern', pattern, namespace=lang)
     patternInfo = datastore.Entity(key)
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
@@ -27,8 +27,7 @@ def index_pattern(lang, pattern):
         "untranslated": []
     })
     # Find all strings 
-    query = client.query(kind='String')
-    query.add_filter('lang', '=', lang)
+    query = client.query(kind='String', namespace=lang)
     query.add_filter('ifpattern', '=', pattern)
     query.projection = []
     query_iter = query.fetch()

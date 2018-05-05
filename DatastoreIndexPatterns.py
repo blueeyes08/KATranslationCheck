@@ -20,7 +20,6 @@ def index_pattern(lang, pattern):
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,
-        "lang": lang,
         # Lists of String IDs
         "approved": [],
         "translated": [],
@@ -48,7 +47,7 @@ def index_pattern(lang, pattern):
     client.put(patternInfo)
 
 def index(lang):
-    query = client.query(kind='String')
+    query = client.query(kind='String', namespace=lang)
     query.distinct_on = ['ifpattern']
     query.projection = ['ifpattern']
     query_iter = query.fetch()

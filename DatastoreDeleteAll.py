@@ -39,8 +39,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', help='The crowdin lang code')
+    parser.add_argument('--yes-i-want-to-delete-everything', action="store_true", help='...')
     args = parser.parse_args()
 
-    delete_all(args.lang, 'String')
-    delete_all(args.lang, 'Pattern')
+    if args.yes_i_want_to_delete_everything:
+        delete_all(args.lang, 'String')
+        delete_all(args.lang, 'Pattern')
+    else:
+        print("--yes-i-want-to-delete-everything missing")
 

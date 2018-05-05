@@ -13,7 +13,6 @@ def get_text_regex():
     regex = r"(\\(text|mathrm|textit|textbf)\s*\{" + exc_clause + r")"
     return re.compile(regex)
 
-
 def get_end_invariant_regex():
     # Apply to reversed string
     return re.compile(r"^((n\\|[\.\?,!\s]+|\]\]\d*\s*[a-z-]+\s+☃\s*\[\[)*)\s*", re.UNICODE)

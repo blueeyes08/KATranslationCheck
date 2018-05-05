@@ -1,5 +1,0 @@
-indexes:
-- kind: String
-  properties:
-  - name: lang
-  - name: ifpattern

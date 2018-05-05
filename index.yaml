@@ -1,0 +1,8 @@
+indexes:
+- kind: Pattern
+  properties:
+  - name: num_untranslated
+    direction: desc
+  - name: num_translated
+    direction: desc
+

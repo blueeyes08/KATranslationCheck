@@ -43,6 +43,7 @@ def index_pattern(lang, pattern):
     patternInfo["num_translated"] = len(patternInfo["translated"])
     patternInfo["num_untranslated"] = len(patternInfo["untranslated"])
     patternInfo["num_total"] = patternInfo["num_approved"] + patternInfo["num_translated"] + patternInfo["num_untranslated"]
+    patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
     # Write to DB
     client.put(patternInfo)
 

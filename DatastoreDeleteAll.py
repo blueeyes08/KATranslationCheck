@@ -3,6 +3,7 @@ from google.cloud import datastore
 from collections import namedtuple
 import time
 import sys
+import traceback
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
@@ -12,7 +13,13 @@ from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 client = datastore.Client(project="watts-198422")
 
-executor = ThreadPoolExecutor(512)
+executor = ThreadPoolExecutor(4096)
+
+def delete(key):
+    try:
+        client.delete(key)
+    except Exception as ex:
+        traceback.print_exc()
 
 def delete_all(lang, kind):
     query = client.query(kind=kind, namespace=lang)
@@ -21,7 +28,10 @@ def delete_all(lang, kind):
     count = 0
     futures = []
     for result in query_iter:
-        executor.submit(client.delete, result.key)
+        futures.append(executor.submit(delete, result.key))
+    # Wait for futures to finish
+    for future in concurrent.futures.as_completed(futures):
+        pass
     print("Deleted {} {}s".format(count, kind))
 
 if __name__ == "__main__":

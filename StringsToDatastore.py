@@ -13,8 +13,9 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 
 # Create & store an entity
-def write_entry(obj):
-    key = client.key('String', "{}-{}".format(obj["lang"], obj["id"]))
+def write_entry(obj, lang):
+    key = client.key('String', obj["id"], namespace=lang)
+    del obj["id"]
     entity = datastore.Entity(key)
     entity.update(obj)
     client.put(entity)
@@ -34,13 +35,12 @@ def export_lang_to_db(lang):
                 "target": entry.Translated,
                 "is_translated": entry.IsTranslated,
                 "is_approved": entry.IsApproved,
-                "lang": lang,
                 "translation_source": "Crowdin",
                 "ifpattern": ifIndexer._normalize(entry.Source),
                 "file": canonicalFilename
             }
             # Async write
-            executor.submit(write_entry, obj)
+            executor.submit(write_entry, obj, lang)
             # Stats
             count += 1
             if count % 1000 == 0:

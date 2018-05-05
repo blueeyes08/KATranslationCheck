@@ -14,7 +14,7 @@ client = datastore.Client(project="watts-198422")
 
 executor = ThreadPoolExecutor(512)
 
-def delete_alllang, kind):
+def delete_all(lang, kind):
     query = client.query(kind=kind, namespace=lang)
     query.projection = []
     query_iter = query.fetch()

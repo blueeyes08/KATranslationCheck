@@ -30,7 +30,7 @@ def export_lang_to_db(lang):
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
             obj = {
-                "id": entry.ID,
+                "id": int(entry.ID),
                 "source": entry.Source,
                 "target": entry.Translated,
                 "is_translated": entry.IsTranslated,

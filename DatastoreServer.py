@@ -9,7 +9,21 @@ from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
-from bottle import route, run, template
+from bottle import route, run, request, response
+
+# the decorator
+def enable_cors(fn):
+    def _enable_cors(*args, **kwargs):
+        # set CORS headers
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+        if request.method != 'OPTIONS':
+            # actual request; reply with the actual response
+            return fn(*args, **kwargs)
+
+    return _enable_cors
 
 client = datastore.Client(project="watts-198422")
 
@@ -22,6 +36,9 @@ def populate(lang, pattern):
     entries = client.get_multi(all_keys)
     # Convert entity list to ID-to-dict map
     entryMap = {entry.key.id: dict(entry) for entry in entries}
+    # Add 
+    for key,value in entryMap.items():
+        value["id"] = key
     # Map pattern
     return {
         "pattern": pattern.key.name,
@@ -39,8 +56,17 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
     # Populate entries with strings
     return list(executor.map(lambda result: populate(lang, result), query_iter))
 
-@route('/api/patterns/<lang>')
+@route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
 def index(lang):
-    return json.dumps(findCommonPatterns(lang))
+    offset = request.query.offset or 0
+    return json.dumps(findCommonPatterns(lang, offset=offset))
 
-run(host='localhost', port=12091)
+@route('/apiv3/save', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    sid = request.query.id
+    translated = request.query.translated
+    # 
+
+run(host='localhost', port=9921)

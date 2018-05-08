@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import cffi_re2 as re
 import time
 from collections import Counter, defaultdict
@@ -161,6 +162,7 @@ class IgnoreFormulaPatternIndexer(object):
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}
         self._formula_re = re.compile(r"\$[^\$]+\$")
+        self._input_re = re.compile(r"\s*\[\[☃\s+[a-z-]+\s*\d*\]\]\s*")
         self._end_invariant_re = get_end_invariant_regex()
         self._start_invariant_re = get_start_invariant_regex()
         #self._end_re
@@ -177,6 +179,7 @@ class IgnoreFormulaPatternIndexer(object):
         normalized_engl = self._formula_re.sub("§formula§", engl)
         #t1 = time.time()
         normalized_engl = self._img_re.sub("§image§", normalized_engl)
+        normalized_engl = self._input_re.sub("§input§", normalized_engl)
         #t2 = time.time()
         normalized_engl = self._end_invariant_re.sub("", normalized_engl[::-1])[::-1]
         #t3 = time.time()

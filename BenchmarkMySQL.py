@@ -7,6 +7,20 @@ import time
 with open("mysql-rootpw.txt") as pwfile:
     password = pwfile.read().strip()
 
+"""
+CREATE TABLE `strings` (
+  `id` int(11) NOT NULL,
+  `pattern` text,
+  `source` text NOT NULL,
+  `target` text,
+  `translated` tinyint(4) DEFAULT NULL,
+  `approved` tinyint(4) DEFAULT NULL,
+  `target_source` varchar(45) DEFAULT NULL,
+  `file` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+"""
+
 db = pymysql.connect(host="35.227.106.167",
                      user="root",
                      passwd=password,

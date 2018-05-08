@@ -13,7 +13,6 @@ def get_text_regex():
     regex = r"(\\(text|mathrm|textit|textbf)\s*\{" + exc_clause + r")"
     return re.compile(regex)
 
-
 def get_end_invariant_regex():
     # Apply to reversed string
     return re.compile(r"^((n\\|[\.\?,!\s]+|\]\]\d*\s*[a-z-]+\s+☃\s*\[\[)*)\s*", re.UNICODE)
@@ -30,7 +29,7 @@ def get_text_content_regex():
     return re.compile(r"(\\text\s*\{\s*)([^\}]+?)(\s*\})") 
 
 def get_image_regex():
-    return re.compile(r"((!\[(graph)?\]\()?\s*(http|https|web\+graphie):\/\/ka-perseus-(images|graphie)\.s3\.amazonaws\.com\/[0-9a-f]+(\.(svg|png|jpg))?\)?)")
+    return re.compile(r"((!\[([^\]]+)?\]\()?\s*(http|https|web\+graphie):\/\/(ka-perseus-(images|graphie)\.s3\.amazonaws\.com|fastly\.kastatic\.org\/ka-perseus-graphie)\/[0-9a-f]+(\.(svg|png|jpg))?\)?)")
 
 def transmap_filename(lang, identifier, extension="json"):
     return os.path.join("transmap", "{}.{}.{}".format(

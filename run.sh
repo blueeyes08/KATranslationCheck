@@ -9,6 +9,7 @@ git pull
 ./katc.py -l ka update-translations -j 256
 ./katc.py -l hu update-translations -j 256
 ./katc.py -l cs update-translations -j 256
+./katc.py -l cs update-translations -j 256
 
 # Render
 ./katc.py -l de render -f 2_high
@@ -19,3 +20,4 @@ git pull
 ./katc.py -l sv-SE render -f 2_high
 ./katc.py -l ja render -f 2_high
 ./katc.py -l ka render -f 2_high
+./katc.py -l cz render -f 2_high

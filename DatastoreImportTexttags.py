@@ -7,11 +7,11 @@ from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black
 from AutoTranslationIndexer import TextTagIndexer
-from DatastoreUtils import *
+from DatastoreUtils import DatastoreChunkClient
 
 client = datastore.Client(project="watts-198422")
-
 executor = ThreadPoolExecutor(512)
+chunkClient = DatastoreChunkClient(client, executor)
 
 # Create & store an entity
 def write_entry(obj, lang):
@@ -48,7 +48,7 @@ def ttt(lang, texttags):
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]
     texttagMap = {texttag["english"]: texttag for texttag in texttags}
     # Fetch from DB
-    dbvalues, missing = datastore_get_all(executor, client, dbids)
+    dbvalues, missing = chunkClient.get_multi(dbids)
     print(dbvalues, missing)
     #### Insert missing entries
     # Update missing entry values
@@ -56,7 +56,7 @@ def ttt(lang, texttags):
         entity.update(texttagMap[entity.key.name])
     # Write to DB
     if missing:
-        client.put_multi(missing)
+        chunkClient.put_multi(missing)
     ### Update 
     toUpdate = []
     for dbvalue in dbvalues:
@@ -66,7 +66,7 @@ def ttt(lang, texttags):
             dbvalue.update(texttag)
             toUpdate.append(dbvalue)
     if toUpdate:
-        client.put_multi(toUpdate)
+        chunkClient.put_multi(toUpdate)
     print("Inserted {} entries, updated {} entries".format(len(missing), len(toUpdate)))
 
 if __name__ == "__main__":

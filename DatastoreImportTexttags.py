@@ -43,7 +43,7 @@ def ttt(lang, texttags):
     # Delete type, which is always "texttag"
     for texttag in texttags:
         texttag["approved_in_ui"] = False
-        print(texttag[""])
+        del texttag["files"]
         del texttag["type"]
     # Generate DB ids
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]
@@ -54,6 +54,7 @@ def ttt(lang, texttags):
     # Update missing entry values
     for entity in missing:
         entity.update(texttagMap[entity.key.name])
+        print(entity)
     # Write to DB
     if missing:
         chunkClient.put_multi(missing)

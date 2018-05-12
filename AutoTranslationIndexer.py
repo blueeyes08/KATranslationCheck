@@ -41,6 +41,7 @@ class TextTagIndexer(object):
         self.index = Counter() # TOTAL count for each text tag
         self.untranslated_count = Counter()
         self.unapproved_count = Counter()
+        self.approved_count = Counter()
         self.approved_index = defaultdict(Counter) # norm engl => translation => count ONLY for proofread versions
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
         self.filename_index = defaultdict(Counter) # norm_engl => {filename: count}

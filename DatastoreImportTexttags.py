@@ -43,14 +43,25 @@ def ttt(lang, texttags):
     # Fetch from DB
     missing = []
     dbvalues = client.get_multi(dbids, missing=missing)
-    print(dbvalues)
     #### Insert missing entries
     # Update missing entry values
     for entity in missing:
-        entity.update(texttagMap[entity.key.name])
-    print(missing)
+        entity.update()
     # Write to DB
-    client.put_multi(missing)
+    if missing:
+        client.put_multi(missing)
+    ### Update 
+    toUpdate = []
+    for dbvalue in dbvalues:
+        updated = False
+        texttag = texttagMap[dbvalue.key.name]
+        # Update translation
+        if (texttag["translated"] != dbvalue["translated"]) or (texttag["translation_is_proofread"] != dbvalue["translation_is_proofread"]):
+            dbvalue.update(texttag)
+            toUpdate.append(dbvalue)
+    if toUpdate:
+        client.put_multi(toUpdate)
+    print("Inserted {} entries, updated {} entries".format(len(missing), len(toUpdate)))
 
 if __name__ == "__main__":
     import argparse

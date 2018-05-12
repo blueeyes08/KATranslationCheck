@@ -37,6 +37,9 @@ def export_lang_to_db(lang, filt):
     return ttt(lang, list(indexer._convert_to_json()))
 
 def ttt(lang, texttags):
+    # Delete type, which is always "texttag"
+    for texttag in texttags:
+        del texttag["type"]
     # Generate DB ids
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]
     texttagMap = {texttag["english"]: texttag for texttag in texttags}

@@ -30,7 +30,7 @@ def export_lang_to_db(lang, filt):
         print(black(file, bold=True))
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
-            indexer.add(entry.Source, entry.Translated, file, entry.IsApproved)
+            indexer.add(entry.Source, entry.Translated, file.rpartition("/")[2], entry.IsApproved)
             # Stats
             count += 1
             if count % 1000 == 0:
@@ -43,6 +43,7 @@ def ttt(lang, texttags):
     # Delete type, which is always "texttag"
     for texttag in texttags:
         texttag["approved_in_ui"] = False
+        print(texttag[""])
         del texttag["type"]
     # Generate DB ids
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]

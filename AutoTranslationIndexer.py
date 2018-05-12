@@ -39,8 +39,8 @@ class TextTagIndexer(object):
     def __init__(self, lang):
         self.lang = lang
         self.index = Counter() # TOTAL count for each text tag
-        self.untranslated_count = Counter()
-        self.unapproved_count = Counter()
+        self.untranslated_count = Counter() # How many times has the text tag been seen where it was not translated?
+        self.unapproved_count = Counter() # How many times has the texttag been seen in a not-translated or not-approved form?
         self.approved_count = Counter()
         self.approved_index = defaultdict(Counter) # norm engl => translation => count ONLY for proofread versions
         self.translated_index = defaultdict(Counter) # norm engl => translation => count
@@ -53,7 +53,7 @@ class TextTagIndexer(object):
         # Just make sure that transl_hits has the same length as index
         transl_hits = None if translated is None else self._re.finditer(translated)
         # Find hits in english
-        if translated is not None: # Translated, do not count but index
+        if translated: # Translated, do not count but index
             for engl_hit, transl_hit in zip(engl_hits, transl_hits):
                 # Extract corresponding hits
                 engl_hit = engl_hit.group(2).strip()
@@ -62,13 +62,18 @@ class TextTagIndexer(object):
                 if is_numeric_only(engl_hit):
                     continue # Trivial, don't index
                 # Count
+                self.filename_index[engl_hit][filename] += 1
                 self.index[engl_hit] += 1
+                if not approved:
+                    self.unapproved_count[engl_hit] += 1
                 # If untranslated, do not index translions
                 if transl_hit:
                     if approved:
                         self.approved_index[engl_hit][transl_hit] += 1
                     else:
                         self.translated_index[engl_hit][transl_hit] += 1
+                else:
+                    self.untranslated_count[engl_hit] += 1
         else: # Not translated, just index to collect stats
             for engl_hit in engl_hits:
                 engl_hit = engl_hit.group(2).strip()
@@ -105,8 +110,9 @@ class TextTagIndexer(object):
             if only_proofread_patterns and not pattern_from_proofread:
                 continue
             yield {"english": hit,
-                "translated": transl, "count": total_count,
+                "translated": transl,
                 "has_translation": bool(transl),
+                "count": total_count,
                 "untranslated_count": untransl_count,
                 "unapproved_count": unapproved_count,
                 "files": self.filename_index[hit],

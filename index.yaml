@@ -1,1 +1,6 @@
 indexes:
+- kind: Texttag
+  properties:
+  - name: approved_in_ui
+  - name: unapproved_count
+    direction: desc

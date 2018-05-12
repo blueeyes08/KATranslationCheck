@@ -66,6 +66,7 @@ def index(lang):
 def findTexttags(lang, offset=0):
     query = client.query(kind='Texttag', namespace=lang)
     query.add_filter('unapproved_count', '>', 0)
+    query.add_filter('approved_in_ui', '=', False)
     query.order = ['-unapproved_count']
     query_iter = query.fetch(100, offset=offset)
     count = 0

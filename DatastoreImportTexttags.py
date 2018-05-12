@@ -42,7 +42,7 @@ def ttt(lang, texttags):
     texttags = [texttag for texttag in texttags if texttag["english"] not in ('', '______')]
     # Delete type, which is always "texttag"
     for texttag in texttags:
-        texttag["approved_in_ui"] = True
+        texttag["approved_in_ui"] = False
         del texttag["type"]
     # Generate DB ids
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]

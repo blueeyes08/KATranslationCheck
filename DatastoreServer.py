@@ -56,11 +56,28 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
     # Populate entries with strings
     return list(executor.map(lambda result: populate(lang, result), query_iter))
 
+
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
+
+def findTexttags(lang, offset=0):
+    query = client.query(kind='Texttag', namespace=lang)
+    query.add_filter('unapproved_count', '>', 0)
+    query.order = ['-unapproved_count']
+    query_iter = query.fetch(100, offset=offset)
+    count = 0
+    futures = []
+    # Populate entries with strings
+    return list(query_iter)
+
+@route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    offset = request.query.offset or 0
+    return json.dumps(findTexttags(lang, offset))
 
 @route('/apiv3/save', method=['OPTIONS', 'GET'])
 @enable_cors

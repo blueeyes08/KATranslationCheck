@@ -87,7 +87,7 @@ class TextTagIndexer(object):
     def _convert_to_json(self, ignore_alltranslated=False, only_proofread_patterns=False):
         texttags = []
         # Sort by most untranslated
-        for (hit, count) in self.untranslated_count.most_common():
+        for (hit, count) in self.index.most_common():
             total_count = self.index[hit]
             untransl_count = self.untranslated_count[hit]
             unapproved_count = self.unapproved_count[hit]
@@ -101,18 +101,17 @@ class TextTagIndexer(object):
                 pattern_from_proofread = True
             elif len(self.translated_index[hit]) > 0:
                 transl = self.translated_index[hit].most_common(1)[0][0]
-
             if only_proofread_patterns and not pattern_from_proofread:
                 continue
-
-            texttags.append({"english": hit,
+            yield {"english": hit,
                 "translated": transl, "count": total_count,
+                "has_translation": bool(transl),
                 "untranslated_count": untransl_count,
+                "unapproved_count": unapproved_count,
                 "files": self.filename_index[hit],
                 "type": "texttag",
-                "translation_is_proofread": pattern_from_proofread})
+                "translation_is_proofread": pattern_from_proofread}
         print("Found {} text tags".format(len(texttags)))
-        return texttags
 
     def preindex(self, *args, **kwargs):
         pass
@@ -121,7 +120,7 @@ class TextTagIndexer(object):
         pass
 
     def exportJSON(self, ignore_alltranslated=False, only_proofread_patterns=False):
-        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
+        texttags = list(self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns))
         # Export main patterns file
         with open(transmap_filename(self.lang, "texttags"), "w") as outfile:
             json.dump(texttags, outfile, indent=4, sort_keys=True)
@@ -132,13 +131,13 @@ class TextTagIndexer(object):
                 outfile, indent=4, sort_keys=True)
 
     def exportXLIFF(self, ignore_alltranslated=False, only_proofread_patterns=False):
-        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
+        texttags = list(self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns))
         soup = pattern_list_to_xliff(texttags)
         with open(transmap_filename(self.lang, "texttags", "xliff"), "w") as outfile:
             outfile.write(str(soup))
 
     def exportXLSX(self, ignore_alltranslated=False, only_proofread_patterns=False):
-        texttags = self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns)
+        texttags = list(self._convert_to_json(ignore_alltranslated, only_proofread_patterns=only_proofread_patterns))
         filename = transmap_filename(self.lang, "texttags", "xlsx")
         to_xlsx(texttags, filename)
 

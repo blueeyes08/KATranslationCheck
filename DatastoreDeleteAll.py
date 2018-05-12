@@ -45,6 +45,7 @@ if __name__ == "__main__":
     if args.yes_i_want_to_delete_everything:
         delete_all(args.lang, 'String')
         delete_all(args.lang, 'Pattern')
+        delete_all(args.lang, 'Texttag')
     else:
         print("--yes-i-want-to-delete-everything missing")
 

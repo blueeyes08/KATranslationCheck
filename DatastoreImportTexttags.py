@@ -37,8 +37,11 @@ def export_lang_to_db(lang, filt):
     return ttt(lang, list(indexer._convert_to_json()))
 
 def ttt(lang, texttags):
+    # Ignore empty texttag
+    texttags = [texttag for texttag in texttags if texttag["english"]]
     # Delete type, which is always "texttag"
     for texttag in texttags:
+        texttag["approved_in_ui"] = True
         del texttag["type"]
     # Generate DB ids
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]
@@ -49,17 +52,16 @@ def ttt(lang, texttags):
     #### Insert missing entries
     # Update missing entry values
     for entity in missing:
-        entity.update()
+        entity.update(texttagMap[entity.key.name])
     # Write to DB
     if missing:
         client.put_multi(missing)
     ### Update 
     toUpdate = []
     for dbvalue in dbvalues:
-        updated = False
         texttag = texttagMap[dbvalue.key.name]
         # Update translation
-        if (texttag["translated"] != dbvalue["translated"]) or (texttag["translation_is_proofread"] != dbvalue["translation_is_proofread"]):
+        if ("translated" not in dbvalue) or (texttag["translated"] != dbvalue["translated"]) or (texttag["translation_is_proofread"] != dbvalue["translation_is_proofread"]):
             dbvalue.update(texttag)
             toUpdate.append(dbvalue)
     if toUpdate:

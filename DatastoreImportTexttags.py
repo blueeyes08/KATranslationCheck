@@ -7,6 +7,7 @@ from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black
 from AutoTranslationIndexer import TextTagIndexer
+from DatastoreUtils import *
 
 client = datastore.Client(project="watts-198422")
 
@@ -47,8 +48,7 @@ def ttt(lang, texttags):
     dbids = [client.key('Texttag', texttag["english"], namespace=lang) for texttag in texttags]
     texttagMap = {texttag["english"]: texttag for texttag in texttags}
     # Fetch from DB
-    missing = []
-    dbvalues = client.get_multi(dbids, missing=missing)
+    dbvalues, missing = datastore_get_all(executor, client, dbids)
     #### Insert missing entries
     # Update missing entry values
     for entity in missing:

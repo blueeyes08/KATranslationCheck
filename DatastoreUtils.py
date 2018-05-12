@@ -39,7 +39,6 @@ class DatastoreChunkClient(object):
         all_missing = []
         all_vals = []
         for vals, missing in self.executor.map(lambda chunk: _get_chunk(self.client, chunk), _chunks(keys, 1000)):
-            print(vals, missing)
             all_vals += vals
             all_missing += missing
         return all_vals, all_missing

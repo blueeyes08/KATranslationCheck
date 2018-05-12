@@ -39,7 +39,7 @@ def export_lang_to_db(lang, filt):
 
 def ttt(lang, texttags):
     # Ignore empty texttag
-    texttags = [texttag for texttag in texttags if texttag["english"]]
+    texttags = [texttag for texttag in texttags if texttag["english"] not in ('', '______')]
     # Delete type, which is always "texttag"
     for texttag in texttags:
         texttag["approved_in_ui"] = True

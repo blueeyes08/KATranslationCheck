@@ -22,4 +22,4 @@ def datastore_get_all(executor, client, keys):
     for vals, missing in executor.map(lambda chunk: get_chunk(client, chunk), chunks(keys)):
         all_missing += missing
         all_vals += vals
-    return all_missing, all_vals
+    return all_vals, all_missing

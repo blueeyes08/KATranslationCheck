@@ -49,7 +49,6 @@ def ttt(lang, texttags):
     texttagMap = {texttag["english"]: texttag for texttag in texttags}
     # Fetch from DB
     dbvalues, missing = chunkClient.get_multi(dbids)
-    print(dbvalues, missing)
     #### Insert missing entries
     # Update missing entry values
     for entity in missing:

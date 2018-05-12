@@ -52,5 +52,5 @@ class DatastoreChunkClient(object):
 
         Returns (values, missing).
         """
-        for vals, missing in self.executor.map(lambda chunk: self.client.put_multi(chunk), _chunks(entities, 400)):
+        for none in self.executor.map(lambda chunk: self.client.put_multi(chunk), _chunks(entities, 400)):
             pass

@@ -13,13 +13,14 @@ def get_chunk(client, keys):
     Get a single chunk
     """
     missing = []
-    vals = client.get_multi(keys)
+    vals = client.get_multi(keys, missing=missing)
     return vals, missing
 
 def datastore_get_all(executor, client, keys):
     all_missing = []
     all_vals = []
     for vals, missing in executor.map(lambda chunk: get_chunk(client, chunk), chunks(keys)):
-        all_missing += missing
+        print(vals, missing)
         all_vals += vals
+        all_missing += missing
     return all_vals, all_missing

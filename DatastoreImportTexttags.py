@@ -49,6 +49,7 @@ def ttt(lang, texttags):
     texttagMap = {texttag["english"]: texttag for texttag in texttags}
     # Fetch from DB
     dbvalues, missing = datastore_get_all(executor, client, dbids)
+    print(dbvalues, missing)
     #### Insert missing entries
     # Update missing entry values
     for entity in missing:

@@ -100,7 +100,7 @@ class GoogleCloudDatastoreTexttagSrc(object):
         # Handle special keys that can not be requested online
         if i == "":
             return ""
-        print("Texttag" , '"{}"'.format(i))
+        #print("Texttag" , '"{}"'.format(i))
         # Normal request
         key = self.client.key('Texttag', i, namespace=self.lang)
         result = self.client.get(key, eventual=True)

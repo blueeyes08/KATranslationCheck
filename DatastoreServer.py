@@ -8,9 +8,13 @@ from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
+import traceback
 from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
+
+client = datastore.Client(project="watts-198422")
+executor = ThreadPoolExecutor(512)
 
 # the decorator
 def enable_cors(fn):
@@ -26,25 +30,17 @@ def enable_cors(fn):
 
     return _enable_cors
 
-client = datastore.Client(project="watts-198422")
-
-executor = ThreadPoolExecutor(512)
-
 def populate(lang, pattern):
-    all_ids = pattern.get("translated", []) + pattern.get("untranslated", [])
-    # Convert IDs to keys
+    all_ids = pattern.get("untranslated", []) + pattern.get("translated", [])
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
     entries = client.get_multi(all_keys)
-    # Convert entity list to ID-to-dict map
-    entryMap = {entry.key.id: dict(entry) for entry in entries}
-    # Add 
-    for key,value in entryMap.items():
-        value["id"] = key
+
+    for entry in entries:
+        entry["id"] = entry.key.id_or_name
     # Map pattern
     return {
         "pattern": pattern.key.name,
-        "translated": [entryMap[kid] for kid in pattern.get("translated", []) if kid in entryMap],
-        "untranslated": [entryMap[kid] for kid in pattern.get("untranslated", []) if kid in entryMap]
+        "strings": entries
     }
 
 def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
@@ -52,8 +48,6 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
     query.add_filter('num_unapproved', '>', 0)
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
-    count = 0
-    futures = []
     # Populate entries with strings
     return list(executor.map(lambda result: populate(lang, result), query_iter))
 
@@ -63,6 +57,19 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
 def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
+
+def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation"):
+    try:
+        key = client.key('String', sid, namespace=lang)
+        value = client.get(key)
+        value.update({
+            "translation": newTranslation,
+            "translation_source": src
+        })
+        client.put(value)
+    except Exception as ex:
+        traceback.print_exc()
+
 
 @route('/apiv3/pattern-smart-translate/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
@@ -86,10 +93,22 @@ def index(lang):
     }
     texttags = GoogleCloudDatastoreTexttagSrc(lang, client)
     translator = IFPatternAutotranslator(lang, 1000, ifpatterns, texttags)
-    #print(englPattern, translatedPattern)
-    for string in strings:
-        print(string["source"], translator.translate(string["source"]))
-    return "{}"
+    # Update all strings
+    def _translate_string(string):
+        # Do not "throw away" an old translation
+        oldTarget = string["target"]
+        string["target"] = translator.translate(string["source"]) or oldTarget
+        # Update string in DB (async)
+        if string["target"] != oldTarget or string["translation_source"] != "SmartTranslation":
+            executor.submit(updateStringTranslation, lang, string["id"], string["target"])
+        return string
+    strings = list(executor.map(_translate_string, strings))
+    # Return translated strin
+    return json.dumps({
+        "pattern": englPattern,
+        "translation": translatedPattern,
+        "strings": strings
+    })
 
 
 def submitTexttag(lang, engl, transl):

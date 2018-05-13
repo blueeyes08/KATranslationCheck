@@ -48,7 +48,7 @@ def populate(lang, pattern):
         "strings": entries
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=25, offset=0):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     query.order = ['-' + orderBy]

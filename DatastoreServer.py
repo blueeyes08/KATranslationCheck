@@ -127,6 +127,16 @@ def findTexttags(lang, offset=0):
     # Populate entries with strings
     return list(query_iter)
 
+
+@route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang):
+    string = json.load(request.body)
+    engl = info['english']
+    transl = info['translated']
+    submitTexttag(lang, engl, transl)
+    return json.dumps({"status": "ok"})
+
 @route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):

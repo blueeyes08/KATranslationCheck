@@ -9,7 +9,6 @@ from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 client = datastore.Client(project="watts-198422")
-
 executor = ThreadPoolExecutor(512)
 
 # Create & store an entity
@@ -37,7 +36,8 @@ def export_lang_to_db(lang, filt):
                 "is_approved": entry.IsApproved,
                 "translation_source": "Crowdin",
                 "ifpattern": ifIndexer._normalize(entry.Source),
-                "file": canonicalFilename
+                "file": canonicalFilename,
+                "fileid": entry.FileID
             }
             # Async write
             executor.submit(write_entry, obj, lang)

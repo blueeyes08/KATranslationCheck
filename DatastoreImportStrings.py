@@ -33,6 +33,7 @@ def export_lang_to_db(lang, filt):
                 "id": int(entry.ID),
                 "source": entry.Source,
                 "target": entry.Translated,
+                "source_length": len(entry.Source),
                 "is_translated": entry.IsTranslated,
                 "is_approved": entry.IsApproved,
                 "translation_source": "Crowdin",

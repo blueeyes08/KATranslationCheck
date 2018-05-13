@@ -25,6 +25,7 @@ def export_lang_to_db(lang, filt):
     for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
+        section = canonicalFilename.partition("/")[0]
         print(black(file, bold=True))
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
@@ -37,7 +38,8 @@ def export_lang_to_db(lang, filt):
                 "translation_source": "Crowdin",
                 "ifpattern": ifIndexer._normalize(entry.Source),
                 "file": canonicalFilename,
-                "fileid": entry.FileID
+                "fileid": entry.FileID,
+                "section": section
             }
             # Async write
             executor.submit(write_entry, obj, lang)

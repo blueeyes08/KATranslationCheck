@@ -626,28 +626,37 @@ class FullAutoTranslator(object):
         # Syntax equivalence check.
         # Ignores whitespace as it will happen for various languages due to grammatics
         if txt2 is None:
+            print("--> txt2 is None", file=self.dbgout)
             return None
         # disabled as it fails for text subtrans
         #if not self.check_regex_equal(self._formula_re, engl, txt2, "formula"):
         #    return None
         if not self.check_regex_equal(self._asterisk_re, engl, txt2, "asterisk"):
+            print("--> Asterisk not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._entity_re, engl, txt2, "entity"):
+            print("--> entity not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._newline_re, engl, txt2, "newline"):
+            print("--> newline not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._input_re, engl, txt2, "input"):
+            print("--> input not equal", file=self.dbgout)
             return None
         # disabled as URL subtrans will cause it to fail
         #if not self.check_regex_equal(self._image_re, engl, txt2, "image"):
         #    return None
         if not self.check_regex_equal(self._tag_re, engl, txt2, "tag"):
+            print("--> tag not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._code_re, engl, txt2, "code"):
+            print("--> code not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._kaplaceholder_re, engl, txt2, "KA placeholder"):
+            print("--> KA placeholder not equal", file=self.dbgout)
             return None
         if not self.check_regex_equal(self._mobile_placeholder_re, engl, txt2, "KA mobile placeholder"):
+            print("--> mobile not equal", file=self.dbgout)
             return None
         # Reduce limit only after successful translation
         self.limit -= 1

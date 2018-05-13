@@ -175,9 +175,6 @@ def index(lang):
     return json.dumps({"status": "ok"})
 
 
-
-
-
 @route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
@@ -192,5 +189,19 @@ def index(lang):
     transl = info['translated']
     submitTexttag(lang, engl, transl)
     return json.dumps({"status": "ok"})
+
+
+@route('/apiv3/beast-translate/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang):
+    info = json.load(request.body)
+    engl = info['english']
+    translator = FullAutoTranslator(lang)
+    transl = translator.translate(engl)
+    if transl is None:
+        return json.dumps({"status": "error"})
+    else: # Success
+        return json.dumps({"status": "ok", "translation": transl})
+
 
 run(host='localhost', port=9921)

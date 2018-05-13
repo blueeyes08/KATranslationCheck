@@ -160,7 +160,7 @@ def index(lang):
     stringid = string['id']
     approve = string['approve']
     # Upload to Crowdin
-    upload_string(fileid, lang, stringid, engl, transl, approve)
+    executor.submit(upload_string, fileid, lang, stringid, engl, transl, approve)
     # Update in Datastore
     executor.submit(updateStringTranslation, lang, stringid, transl, just_translated=True, just_approved=approve)
     # Index pattern after allowing the DB to sync

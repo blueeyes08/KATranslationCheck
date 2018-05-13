@@ -42,19 +42,23 @@ def populate(lang, pattern):
 
     # Filter out already-approved strings
     entries = [entry for entry in entries if not entry["is_approved"]]
+    # If there are no leftover strings, reindex that pattern.
+    if len(entries) == 0:
+        return None
     # Map pattern
     return {
         "pattern": pattern.key.name,
         "strings": entries
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=25, offset=0):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=30, offset=0):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
     # Populate entries with strings
-    return list(executor.map(lambda result: populate(lang, result), query_iter))
+    return [v for v in executor.map(lambda result: populate(lang, result), query_iter)
+            if v is not None]
 
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
@@ -148,8 +152,8 @@ def findTexttags(lang, offset=0):
     # Populate entries with strings
     return list(query_iter)
 
-def delayedIndexPattern(lang, pattern):
-    time.sleep(10) # Allow DB to sync
+def delayedIndexPattern(lang, pattern, delay=10):
+    time.sleep(delay) # Allow DB to sync
     index_pattern(client, lang, pattern)
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
@@ -167,7 +171,7 @@ def index(lang):
     # Update in Datastore
     executor.submit(updateStringTranslation, lang, stringid, transl, just_translated=True, just_approved=approve)
     # Index pattern after allowing the DB to sync
-    executor.submit(delayedIndexPattern, lang, pattern)
+    executor.submit(delayedIndexPattern, lang, pattern, delay=0)
     return json.dumps({"status": "ok"})
 
 

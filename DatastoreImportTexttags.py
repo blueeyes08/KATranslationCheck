@@ -13,14 +13,6 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
 
-# Create & store an entity
-def write_entry(obj, lang):
-    key = client.key('String', obj["id"], namespace=lang)
-    del obj["id"]
-    entity = datastore.Entity(key)
-    entity.update(obj)
-    client.put(entity)
-
 def export_lang_to_db(lang, filt):
     count = 0
     indexer = TextTagIndexer(lang)

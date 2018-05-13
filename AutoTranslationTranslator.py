@@ -69,15 +69,56 @@ class RuleAutotranslator(object):
         if is_formula and not contains_text:
             return engl
 
+class DefaultIFPatternSrc(object):
+    def __init__(self, lang):
+        self.ifpatterns = read_ifpattern_index(lang)
+    
+    def __getitem__(self, i):
+        return self.ifpatterns[i]
+
+class DefaultTexttagSrc(object):
+    def __init__(self, lang):
+        self.texttags = read_texttag_index(lang)
+    
+    def __getitem__(self, i):
+        return self.texttags[i]
+
+class GoogleCloudDatastoreTexttagSrc(object):
+    def __init__(self, lang, client):
+        self.lang = lang
+        self.client = client
+        self.cache = {}
+
+    def __contains__(self, i):
+        item = self[i]
+        return item is not None
+    
+    def __getitem__(self, i):
+        # Check cache
+        if i in self.cache:
+            return self.cache[i]
+        # Handle special keys that can not be requested online
+        if i == "":
+            return ""
+        print("Texttag" , '"{}"'.format(i))
+        # Normal request
+        key = self.client.key('Texttag', i, namespace=self.lang)
+        result = self.client.get(key, eventual=True)
+        if result is not None:
+            self.cache[i] = result["translated"]
+            return result["translated"]
+        return None
+
+
 class IFPatternAutotranslator(object):
     """
     Ignore Formula pattern autotranslator
     """
-    def __init__(self, lang, limit=100):
+    def __init__(self, lang, limit=100, ifpatternSrc=None, texttagSrc=None):
         self.lang = lang
         # Read patterns index
-        self.ifpatterns = read_ifpattern_index(lang)
-        self.texttags = read_texttag_index(lang)
+        self.ifpatterns = ifpatternSrc or DefaultIFPatternSrc(lang)
+        self.texttags = texttagSrc or DefaultTexttagSrc(lang)
         self.limit = limit
         # Compile regexes
         self._formula_re = re.compile(r"\$[^\$]+\$")
@@ -112,14 +153,14 @@ class IFPatternAutotranslator(object):
         texttag_replace = {} # texttags: engl full tag to translated full tag 
         for text_hit in self._text.finditer(engl):
             content = text_hit.group(2).strip()
-            if content in self.texttags:
-                # Assemble the correct replacement string
-                translated = text_hit.group(1) + self.texttags[content] + text_hit.group(3)
-                texttag_replace[text_hit.group(0)] = translated
-            elif is_numeric_only(content):
+            if is_numeric_only(content):
                 # Trivial tag, treat as universal
                 translated = text_hit.group(0)
                 texttag_replace[translated] = translated
+            elif content in self.texttags:
+                # Assemble the correct replacement string
+                translated = text_hit.group(1) + self.texttags[content] + text_hit.group(3)
+                texttag_replace[text_hit.group(0)] = translated
             else: # Untranslatable tag
                 self.pattern_missing_tags[normalized][content] += 1
                 self.textTagMissingCounter += 1

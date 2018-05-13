@@ -8,7 +8,8 @@ from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
-from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
+from AutoTranslationIndexer import *
+from AutoTranslationTranslator import *
 from bottle import route, run, request, response
 
 # the decorator
@@ -62,6 +63,34 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=10, offset=0):
 def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
+
+@route('/apiv3/pattern-smart-translate/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang):
+    """
+    POST a translated pattern and a list of strings adhering
+    to that pattern and translate that string according to the
+    patterns.
+    """
+    info = json.load(request.body)
+    english = info["english"]
+    translated = info["translated"]
+    strings = info["strings"]
+    # Create a single pattern / pattern translation pair from the string
+    idxer = IgnoreFormulaPatternIndexer(lang)
+    englPattern = idxer._normalize(english)
+    translatedPattern = idxer._normalize(translated)
+    # Generate 
+    ifpatterns = {
+        englPattern: translatedPattern
+    }
+    texttags = GoogleCloudDatastoreTexttagSrc(lang, client)
+    translator = IFPatternAutotranslator(lang, 1000, ifpatterns, texttags)
+    #print(englPattern, translatedPattern)
+    for string in strings:
+        print(string["source"], translator.translate(string["source"]))
+    return "{}"
+
 
 def submitTexttag(lang, engl, transl):
     key = client.key('Texttag', engl, namespace=lang)

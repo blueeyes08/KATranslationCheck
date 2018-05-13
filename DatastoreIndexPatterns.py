@@ -10,11 +10,7 @@ import concurrent.futures
 from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
-client = datastore.Client(project="watts-198422")
-
-executor = ThreadPoolExecutor(512)
-
-def index_pattern(lang, pattern):
+def index_pattern(client, lang, pattern):
     key = client.key('Pattern', pattern, namespace=lang)
     patternInfo = datastore.Entity(key)
     print("Indexing '{}'".format(pattern))
@@ -47,7 +43,7 @@ def index_pattern(lang, pattern):
     # Write to DB
     client.put(patternInfo)
 
-def index(lang):
+def index(client, executor, lang):
     query = client.query(kind='String', namespace=lang)
     query.distinct_on = ['ifpattern']
     query.projection = ['ifpattern']
@@ -56,7 +52,7 @@ def index(lang):
     futures = []
     for result in query_iter:
         count += 1
-        futures.append(executor.submit(index_pattern, lang, result["ifpattern"]))
+        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"]))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass
@@ -68,5 +64,9 @@ if __name__ == "__main__":
     parser.add_argument('lang', help='The crowdin lang code')
     args = parser.parse_args()
 
-    index(args.lang)
+
+    client = datastore.Client(project="watts-198422")
+    executor = ThreadPoolExecutor(512)
+
+    index(client, executor, args.lang)
 

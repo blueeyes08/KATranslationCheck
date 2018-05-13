@@ -13,6 +13,7 @@ import traceback
 from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
+from DatastoreIndexPatterns import index_pattern
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
@@ -38,6 +39,9 @@ def populate(lang, pattern):
 
     for entry in entries:
         entry["id"] = entry.key.id_or_name
+
+    # Filter out already-approved strings
+    entries = [entry for entry in entries if not entry["is_approved"]]
     # Map pattern
     return {
         "pattern": pattern.key.name,
@@ -141,6 +145,9 @@ def findTexttags(lang, offset=0):
     # Populate entries with strings
     return list(query_iter)
 
+def delayedIndexPattern(lang, pattern):
+    time.sleep(10) # Allow DB to sync
+    index_pattern(client, lang, pattern)
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
@@ -149,12 +156,15 @@ def index(lang):
     engl = string['source']
     transl = string['target']
     fileid = string['fileid']
+    pattern = string['ifpattern']
     stringid = string['id']
     approve = string['approve']
     # Upload to Crowdin
     upload_string(fileid, lang, stringid, engl, transl, approve)
     # Update in Datastore
     executor.submit(updateStringTranslation, lang, stringid, transl, just_translated=True, just_approved=approve)
+    # Index pattern after allowing the DB to sync
+    executor.submit(delayedIndexPattern, lang, pattern)
     return json.dumps({"status": "ok"})
 
 

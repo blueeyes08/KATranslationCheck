@@ -59,7 +59,11 @@ def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
 
-def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation"):
+def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", just_translated=False, just_approved=False):
+    """
+    Update translation of string in datastore.
+    If just_... is Tur
+    """
     try:
         key = client.key('String', sid, namespace=lang)
         value = client.get(key)
@@ -67,6 +71,15 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation"):
             "translation": newTranslation,
             "translation_source": src
         })
+        if just_translated:
+            value.update({
+                "is_translated": True
+            })
+        if just_approved:
+            value.update({
+                "is_approved": True
+            })
+        print(value)
         client.put(value)
     except Exception as ex:
         traceback.print_exc()
@@ -138,7 +151,10 @@ def index(lang):
     fileid = string['fileid']
     stringid = string['id']
     approve = string['approve']
+    # Upload to Crowdin
     upload_string(fileid, lang, stringid, engl, transl, approve)
+    # Update in Datastore
+    executor.submit(updateStringTranslation, lang, stringid, transl, just_translated=True, just_approved=approve)
     return json.dumps({"status": "ok"})
 
 

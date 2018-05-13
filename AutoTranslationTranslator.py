@@ -105,6 +105,8 @@ class GoogleCloudDatastoreTexttagSrc(object):
         key = self.client.key('Texttag', i, namespace=self.lang)
         result = self.client.get(key, eventual=True)
         if result is not None:
+            if result["approved_in_ui"] == False:
+                return None
             self.cache[i] = result["translated"]
             return result["translated"]
         return None

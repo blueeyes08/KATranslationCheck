@@ -10,7 +10,7 @@ import concurrent.futures
 from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
-def index_pattern(client, lang, pattern, section):
+def index_pattern(client, lang, pattern, section="2_high_priority_content"):
     key = client.key('Pattern', pattern, namespace=lang)
     patternInfo = datastore.Entity(key)
     print("Indexing '{}'".format(pattern))

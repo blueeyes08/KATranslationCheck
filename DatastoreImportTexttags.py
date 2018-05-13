@@ -63,7 +63,7 @@ def ttt(lang, texttags):
     for dbvalue in dbvalues:
         texttag = texttagMap[dbvalue.key.name]
         # Update translation
-        if ("translated" not in dbvalue) or (texttag["translated"] != dbvalue["translated"]) or (texttag["translation_is_proofread"] != dbvalue["translation_is_proofread"]):
+        if not dbvalue["approved_in_ui"] and (("translated" not in dbvalue) or (texttag["translated"] != dbvalue["translated"]) or (texttag["translation_is_proofread"] != dbvalue["translation_is_proofread"])):
             dbvalue.update(texttag)
             toUpdate.append(dbvalue)
     if toUpdate:

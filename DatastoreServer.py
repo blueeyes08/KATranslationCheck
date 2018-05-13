@@ -63,6 +63,13 @@ def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
 
+def submitTexttag(lang, engl, transl):
+    key = client.key('Texttag', engl, namespace=lang)
+    obj = client.get(key)
+    obj.update({"translated": transl, "approved_in_ui": True})
+    client.put(obj)
+    print("Updated", obj)
+
 def findTexttags(lang, offset=0):
     query = client.query(kind='Texttag', namespace=lang)
     query.add_filter('unapproved_count', '>', 0)
@@ -80,11 +87,13 @@ def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findTexttags(lang, offset))
 
-@route('/apiv3/save', method=['OPTIONS', 'GET'])
+@route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
 def index(lang):
-    sid = request.query.id
-    translated = request.query.translated
-    # 
+    info = json.load(request.body)
+    engl = info['english']
+    transl = info['translated']
+    submitTexttag(lang, engl, transl)
+    return json.dumps({"status": "ok"})
 
 run(host='localhost', port=9921)

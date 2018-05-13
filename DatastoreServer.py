@@ -4,6 +4,7 @@ from collections import namedtuple
 import time
 import sys
 import simplejson as json
+from XLIFFUpload import *
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
@@ -132,10 +133,17 @@ def findTexttags(lang, offset=0):
 @enable_cors
 def index(lang):
     string = json.load(request.body)
-    engl = info['english']
-    transl = info['translated']
-    submitTexttag(lang, engl, transl)
+    engl = string['source']
+    transl = string['target']
+    fileid = string['fileid']
+    stringid = string['id']
+    approve = string['approve']
+    upload_string(fileid, lang, stringid, engl, transl, approve)
     return json.dumps({"status": "ok"})
+
+
+
+
 
 @route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors

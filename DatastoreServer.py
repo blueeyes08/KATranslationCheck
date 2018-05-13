@@ -115,12 +115,15 @@ def index(lang):
     def _translate_string(string):
         # Do not "throw away" an old translation
         oldTarget = string["target"]
-        string["target"] = translator.translate(string["source"]) or oldTarget
+        autotranslated = translator.translate(string["source"])
+        if autotranslated is None:
+            return None
+        string["target"] = autotranslated or oldTarget
         # Update string in DB (async)
         if string["target"] != oldTarget or string["translation_source"] != "SmartTranslation":
             executor.submit(updateStringTranslation, lang, string["id"], string["target"])
         return string
-    strings = list(executor.map(_translate_string, strings))
+    strings = [s for s in executor.map(_translate_string, strings) if s is not None]
     # Return translated strin
     return json.dumps({
         "pattern": englPattern,

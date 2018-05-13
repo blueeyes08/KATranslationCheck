@@ -75,7 +75,7 @@ def findTexttags(lang, offset=0):
     query.add_filter('unapproved_count', '>', 0)
     query.add_filter('approved_in_ui', '=', False)
     query.order = ['-unapproved_count']
-    query_iter = query.fetch(100, offset=offset)
+    query_iter = query.fetch(500, offset=offset)
     # Populate entries with strings
     return list(query_iter)
 

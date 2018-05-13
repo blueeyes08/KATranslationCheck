@@ -24,7 +24,8 @@ def index_pattern(client, lang, pattern, section="2_high_priority_content"):
     })
     # Find all strings 
     query = client.query(kind='String', namespace=lang)
-    query.add_filter('section', '=', section)
+    if section:
+        query.add_filter('section', '=', section)
     query.add_filter('ifpattern', '=', pattern)
     query.projection = []
     query_iter = query.fetch()
@@ -47,7 +48,8 @@ def index_pattern(client, lang, pattern, section="2_high_priority_content"):
 
 def index(client, executor, lang, section):
     query = client.query(kind='String', namespace=lang)
-    query.add_filter('section', '=', section)
+    if section:
+        query.add_flter('section', '=', section)
     query.distinct_on = ['ifpattern']
     query.projection = ['ifpattern']
     query_iter = query.fetch()

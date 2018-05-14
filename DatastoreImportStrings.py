@@ -29,6 +29,7 @@ def export_lang_to_db(lang, filt):
         print(black(file, bold=True))
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
+            normalized, _, _ = ifTranslator.normalize(entry.Source)
             obj = {
                 "id": int(entry.ID),
                 "source": entry.Source,
@@ -37,7 +38,7 @@ def export_lang_to_db(lang, filt):
                 "is_translated": entry.IsTranslated,
                 "is_approved": entry.IsApproved,
                 "translation_source": "Crowdin",
-                "ifpattern": ifTranslator.normalize(entry.Source),
+                "ifpattern": normalized,
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
                 "section": section

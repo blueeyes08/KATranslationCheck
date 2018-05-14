@@ -183,7 +183,8 @@ class IgnoreFormulaPatternIndexer(object):
 
     def _normalize(self, engl):
         transl = IFPatternAutotranslator(self.lang)
-        return transl.normalize(engl)
+        normalized, _, _ = transl.normalize(engl)
+        return normalized
 
     def preindex(self, engl, translated=None, filename=None, approved=False):
         """

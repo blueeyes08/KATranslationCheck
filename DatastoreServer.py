@@ -127,8 +127,8 @@ def index(lang):
     strings = info["strings"]
     # Create a single pattern / pattern translation pair from the string
     tmp = IFPatternAutotranslator(lang)
-    englPattern = tmp.normalize(english)
-    translatedPattern = tmp.normalize(translated)
+    englPattern, _, _ = tmp.normalize(english)
+    translatedPattern, _, _ = tmp.normalize(translated)
     # Generate 
     ifpatterns = {
         englPattern: translatedPattern

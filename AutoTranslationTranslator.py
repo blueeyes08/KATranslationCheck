@@ -146,13 +146,14 @@ class IFPatternAutotranslator(object):
         normalized = normalized[::-1]
         endStr = (self._end_invariant_re.search(normalized).group(1) or "")[::-1]
         normalized = self._end_invariant_re.sub("", normalized)[::-1]
+        return normalized, startStr, endStr
 
     def translate(self, engl):
         if self.limit <= 0:
             print("Limit hit")
             return None  # dont translate
         # Normalize
-        normalized = self.normalize(engl)
+        normalized, startStr, endStr = self.normalize(engl)
         # Mathrm is a rare alternative to \\text which is unhanled at the moment
         if "mathrm" in engl:
             print("mathrm")
@@ -174,7 +175,7 @@ class IFPatternAutotranslator(object):
                 self.textTagMissingCounter += 1
                 return None # Cant fully translate this string
         # Check if it matches
-        if normalized not in self.ifpatterns:
+        if normalized not in self.ifpatterns or not self.ifpatterns[normalized]:
             print("Normalized pattern not present: '{}'".format(normalized))
             return None # Do not have pattern
         transl = self.ifpatterns[normalized]

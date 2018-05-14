@@ -74,7 +74,6 @@ def index(lang):
     query_iter = query.fetch(250, offset=offset)
     # Ignore the patterns, put ALL the strings into a list
     patterns = [v for v in executor.map(lambda result: populate(lang, result), query_iter) if v is not None]
-    print(patterns)
     longStrings = list(itertools.chain(*([v["strings"] for v in patterns])))
     return json.dumps(longStrings)
 

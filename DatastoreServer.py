@@ -15,9 +15,11 @@ from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
 from DatastoreIndexPatterns import index_pattern
+from DatastoreUtils import DatastoreChunkClient
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
+chunkClient = DatastoreChunkClient(client, executor)
 
 # the decorator
 def enable_cors(fn):
@@ -36,7 +38,7 @@ def enable_cors(fn):
 def populate(lang, pattern):
     all_ids = pattern.get("untranslated", []) + pattern.get("translated", [])
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
-    entries = client.get_multi(all_keys)
+    entries, _ = chunkClient.get_multi(all_keys)
 
     for entry in entries:
         entry["id"] = entry.key.id_or_name

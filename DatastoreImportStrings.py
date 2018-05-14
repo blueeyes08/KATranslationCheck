@@ -6,7 +6,7 @@ from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black
-from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
+from AutoTranslationTranslator import IFPatternAutotranslator
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
@@ -21,7 +21,7 @@ def write_entry(obj, lang):
 
 def export_lang_to_db(lang, filt):
     count = 0
-    ifIndexer = IgnoreFormulaPatternIndexer(lang)
+    ifTranslator = IFPatternAutotranslator(lang)
     for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
@@ -37,7 +37,7 @@ def export_lang_to_db(lang, filt):
                 "is_translated": entry.IsTranslated,
                 "is_approved": entry.IsApproved,
                 "translation_source": "Crowdin",
-                "ifpattern": ifIndexer._normalize(entry.Source),
+                "ifpattern": ifTranslator.normalize(entry.Source),
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
                 "section": section

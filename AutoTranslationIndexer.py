@@ -11,6 +11,7 @@ import json
 from bs4 import BeautifulSoup
 from UpdateAllFiles import getTranslationFilemapCache
 from AutoTranslateCommon import *
+from AutoTranslationTranslator import IFPatternAutotranslator
 
 class CompositeIndexer(object):
     """
@@ -181,18 +182,8 @@ class IgnoreFormulaPatternIndexer(object):
         # Ignore specific whitelisted texts which are not translated
 
     def _normalize(self, engl):
-        #t0 = time.time()
-        normalized_engl = self._formula_re.sub("§formula§", engl)
-        #t1 = time.time()
-        normalized_engl = self._img_re.sub("§image§", normalized_engl)
-        normalized_engl = self._input_re.sub("§input§", normalized_engl)
-        #t2 = time.time()
-        normalized_engl = self._end_invariant_re.sub("", normalized_engl[::-1])[::-1]
-        #t3 = time.time()
-        normalized_engl = self._start_invariant_re.sub("", normalized_engl)
-        #t4 = time.time()
-        #print((t1 - t0), (t2 - t1), (t3 - t2), (t4 - t3))
-        return normalized_engl
+        transl = IFPatternAutotranslator(self.lang)
+        return transl.normalize(engl)
 
     def preindex(self, engl, translated=None, filename=None, approved=False):
         """

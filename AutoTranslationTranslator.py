@@ -135,9 +135,7 @@ class IFPatternAutotranslator(object):
         with open(filename, "w") as outfile:
             json.dump(self.pattern_missing_tags, outfile, indent=4)
 
-    def translate(self, engl):
-        if self.limit <= 0:
-            return None  # dont translate
+    def normalize(self, engl):
         # Normalize and filter out formulae with translatable text
         normalized = self._formula_re.sub("§formula§", engl)
         normalized = self._img_re.sub("§image§", normalized)
@@ -148,8 +146,16 @@ class IFPatternAutotranslator(object):
         normalized = normalized[::-1]
         endStr = (self._end_invariant_re.search(normalized).group(1) or "")[::-1]
         normalized = self._end_invariant_re.sub("", normalized)[::-1]
+
+    def translate(self, engl):
+        if self.limit <= 0:
+            print("Limit hit")
+            return None  # dont translate
+        # Normalize
+        normalized = self.normalize(engl)
         # Mathrm is a rare alternative to \\text which is unhanled at the moment
         if "mathrm" in engl:
+            print("mathrm")
             return None
         # If there are any texts, check if we know how to translate
         texttag_replace = {} # texttags: engl full tag to translated full tag 
@@ -169,6 +175,7 @@ class IFPatternAutotranslator(object):
                 return None # Cant fully translate this string
         # Check if it matches
         if normalized not in self.ifpatterns:
+            print("Normalized pattern not present: '{}'".format(normalized))
             return None # Do not have pattern
         transl = self.ifpatterns[normalized]
         # Find formulae in english text

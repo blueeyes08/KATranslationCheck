@@ -126,15 +126,15 @@ def index(lang):
     translated = info["translated"]
     strings = info["strings"]
     # Create a single pattern / pattern translation pair from the string
-    idxer = IgnoreFormulaPatternIndexer(lang)
-    englPattern = idxer._normalize(english)
-    translatedPattern = idxer._normalize(translated)
+    tmp = IFPatternAutotranslator(lang)
+    englPattern = tmp.normalize(english)
+    translatedPattern = tmp.normalize(translated)
     # Generate 
     ifpatterns = {
         englPattern: translatedPattern
     }
     texttags = GoogleCloudDatastoreTexttagSrc(lang, client)
-    translator = IFPatternAutotranslator(lang, 1000, ifpatterns, texttags)
+    translator = IFPatternAutotranslator(lang, 1000000, ifpatterns, texttags)
     # Update all strings
     def _translate_string(string):
         # Do not "throw away" an old translation
@@ -152,7 +152,8 @@ def index(lang):
     return json.dumps({
         "pattern": englPattern,
         "translation": translatedPattern,
-        "strings": strings
+        "strings": strings,
+        "missing_texttags": dict(translator.pattern_missing_tags[englPattern])
     })
 
 

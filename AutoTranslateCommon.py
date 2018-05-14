@@ -28,8 +28,14 @@ def hash_string(s):
 def get_text_content_regex():
     return re.compile(r"(\\text\s*\{\s*)([^\}]+?)(\s*\})") 
 
+def get_formula_re():
+    return re.compile(r"\$[^\$]+\$") 
+
 def get_image_regex():
     return re.compile(r"((!\[([^\]]+)?\]\()?\s*(http|https|web\+graphie):\/\/(ka-perseus-(images|graphie)\.s3\.amazonaws\.com|fastly\.kastatic\.org\/ka-perseus-graphie)\/[0-9a-f]+(\.(svg|png|jpg))?\)?)")
+
+def get_input_re():
+    return re.compile(r"\s*\[\[☃\s+[a-z-]+\s*\d*\]\]\s*")
 
 def transmap_filename(lang, identifier, extension="json"):
     return os.path.join("transmap", "{}.{}.{}".format(

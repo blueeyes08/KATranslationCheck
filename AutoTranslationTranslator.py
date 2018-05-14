@@ -123,7 +123,8 @@ class IFPatternAutotranslator(object):
         self.texttags = texttagSrc or DefaultTexttagSrc(lang)
         self.limit = limit
         # Compile regexes
-        self._formula_re = re.compile(r"\$[^\$]+\$")
+        self._formula_re = get_formula_re()
+        self._input_re = get_image_regex()
         self._img_re = get_image_regex()
         self._end_invariant_re = get_end_invariant_regex()
         self._start_invariant_re = get_start_invariant_regex()
@@ -139,6 +140,7 @@ class IFPatternAutotranslator(object):
         # Normalize and filter out formulae with translatable text
         normalized = self._formula_re.sub("§formula§", engl)
         normalized = self._img_re.sub("§image§", normalized)
+        normalized = self._input_re.sub("§input§", normalized)
         # Make start invariant and store end for later use
         startStr = self._start_invariant_re.search(normalized).group(1) or ""
         normalized = self._start_invariant_re.sub("", normalized)
@@ -192,6 +194,11 @@ class IFPatternAutotranslator(object):
         while "§image§" in transl:
             next_image = src_images.pop(0)[0] # Next "source image"
             transl = transl.replace("§image§", next_image, 1)
+
+        src_inputs = self._input_re.findall(engl)
+        while "§input§" in transl:
+            next_input = src_inputs.pop(0)[0] # Next "source input"
+            transl = transl.replace("§input§", next_input, 1)
         # Translate text-tags, if any
         for src, repl in texttag_replace.items():
             # Safety: If there is nothing to replace, fail instead of

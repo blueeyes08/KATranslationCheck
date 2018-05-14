@@ -47,6 +47,8 @@ def populate(lang, pattern):
     entries = [entry for entry in entries if not entry["is_approved"]]
     # If there are no leftover strings, reindex that pattern.
     if len(entries) == 0:
+        print("Empty pattern, reindexing")
+        executor.submit(index_pattern, client, lang, pattern["pattern"], pattern["section"])
         return None
     # Map pattern
     return {
@@ -174,7 +176,9 @@ def findTexttags(lang, offset=0):
 
 def delayedIndexPattern(lang, pattern, delay=10):
     time.sleep(delay) # Allow DB to sync
-    index_pattern(client, lang, pattern)
+    # We need to fetch the pattern to get the correct section it was indexed with
+    patternEntity = client.get(client.key('Pattern', pattern, namespace=lang))
+    index_pattern(client, lang, pattern, section=patternEntity["section"])
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

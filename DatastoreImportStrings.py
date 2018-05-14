@@ -43,6 +43,8 @@ def export_lang_to_db(lang, filt):
                 "fileid": entry.FileID,
                 "section": section
             }
+            if "☃" in obj["source"]:
+                print(obj)
             # Async write
             executor.submit(write_entry, obj, lang)
             # Stats

@@ -124,7 +124,7 @@ class IFPatternAutotranslator(object):
         self.limit = limit
         # Compile regexes
         self._formula_re = get_formula_re()
-        self._input_re = get_image_regex()
+        self._input_re = get_input_re()
         self._img_re = get_image_regex()
         self._end_invariant_re = get_end_invariant_regex()
         self._start_invariant_re = get_start_invariant_regex()
@@ -138,9 +138,9 @@ class IFPatternAutotranslator(object):
 
     def normalize(self, engl):
         # Normalize and filter out formulae with translatable text
-        normalized = self._formula_re.sub("§formula§", engl)
+        normalized = self._input_re.sub("§input§", engl)
+        normalized = self._formula_re.sub("§formula§", normalized)
         normalized = self._img_re.sub("§image§", normalized)
-        normalized = self._input_re.sub("§input§", normalized)
         # Make start invariant and store end for later use
         startStr = self._start_invariant_re.search(normalized).group(1) or ""
         normalized = self._start_invariant_re.sub("", normalized)

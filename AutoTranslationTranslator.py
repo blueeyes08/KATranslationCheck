@@ -186,7 +186,6 @@ class IFPatternAutotranslator(object):
         # Replace one-by-one
         #
         src_formulae = self._formula_re.findall(engl)
-        print("SF",src_formulae)
         while "§formula§" in transl:
             next_formula = src_formulae.pop(0) # Next "source formula"
             transl = transl.replace("§formula§", next_formula, 1)
@@ -197,11 +196,8 @@ class IFPatternAutotranslator(object):
             transl = transl.replace("§image§", next_image, 1)
 
         src_inputs = self._input_re.findall(engl)
-        print("Transl",transl)
-        print("SI",src_inputs)
         while "§input§" in transl:
             next_input = src_inputs.pop(0) # Next "source input"
-            print(next_input)
             transl = transl.replace("§input§", next_input, 1)
         # Translate text-tags, if any
         for src, repl in texttag_replace.items():

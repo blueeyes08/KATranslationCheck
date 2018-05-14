@@ -107,7 +107,6 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
             value.update({
                 "is_approved": True
             })
-        print(value)
         client.put(value)
     except Exception as ex:
         traceback.print_exc()

@@ -71,7 +71,7 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0):
 def index(lang):
     offset = int(request.query.offset) or 0
     n = int(request.query.n) or 20
-    return json.dumps(findCßommonPatterns(lang, offset=offset, n=n))
+    return json.dumps(findCommonPatterns(lang, offset=offset, n=n))
 
 
 @route('/apiv3/long-strings/<lang>', method=['OPTIONS', 'GET'])

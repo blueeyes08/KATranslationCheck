@@ -86,7 +86,7 @@ def index(lang):
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
-    offset = request.query.offset or 0
+    offset = int(request.query.offset) or 0
     return json.dumps(findCommonPatterns(lang, offset=offset))
 
 def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", just_translated=False, just_approved=False):

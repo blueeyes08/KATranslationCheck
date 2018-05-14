@@ -16,6 +16,7 @@ def index_pattern(client, lang, pattern, section="2_high_priority_content"):
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,
+        "pattern_length": len(pattern),
         "section": section,
         # Lists of String IDs
         "approved": [],
@@ -49,7 +50,7 @@ def index_pattern(client, lang, pattern, section="2_high_priority_content"):
 def index(client, executor, lang, section):
     query = client.query(kind='String', namespace=lang)
     if section:
-        query.add_flter('section', '=', section)
+        query.add_filter('section', '=', section)
     query.distinct_on = ['ifpattern']
     query.projection = ['ifpattern']
     query_iter = query.fetch()

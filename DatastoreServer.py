@@ -66,6 +66,14 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0):
             if v is not None]
 
 
+@route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    offset = int(request.query.offset) or 0
+    n = int(request.query.n) or 20
+    return json.dumps(findCßommonPatterns(lang, offset=offset, n=n))
+
+
 @route('/apiv3/long-strings/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
@@ -80,14 +88,6 @@ def index(lang):
     patterns = [v for v in executor.map(lambda result: populate(lang, result), query_iter) if v is not None]
     longStrings = list(itertools.chain(*([v["strings"] for v in patterns])))
     return json.dumps(longStrings)
-
-
-
-@route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
-@enable_cors
-def index(lang):
-    offset = int(request.query.offset) or 0
-    return json.dumps(findCommonPatterns(lang, offset=offset))
 
 def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", just_translated=False, just_approved=False):
     """

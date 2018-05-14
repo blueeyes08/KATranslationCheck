@@ -10,7 +10,7 @@ indexes:
   - name: ifpattern
 - kind: Pattern
   properties:
-  - name: total_count
-  - name: unapproved_count
+  - name: num_total
+  - name: num_unapproved
   - name: pattern_length
     direction: desc

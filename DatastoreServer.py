@@ -68,13 +68,15 @@ def index(lang):
     offset = 0 # Maybe TODO later
     # Stage 1: Find 
     query = client.query(kind='Pattern', namespace=lang)
-    query.add_filter('total_count', '=', 1)
-    query.add_filter('unapproved_count', '=', 1)
+    query.add_filter('num_total', '=', 1)
+    query.add_filter('num_unapproved', '=', 1)
     query.order = ['-pattern_length']
     query_iter = query.fetch(100, offset=offset)
     # Ignore the patterns, put ALL the strings into a list
-    return itertools.chain(*(v["strings"] for v in executor.map(lambda result: populate(lang, result), query_iter)
-            if v is not None))
+    patterns = [v for v in executor.map(lambda result: populate(lang, result), query_iter) if v is not None]
+    print(patterns)
+    longStrings = list(itertools.chain(*([v["string"] for v in patterns])))
+    return json.dumps(longStrings)
 
 
 

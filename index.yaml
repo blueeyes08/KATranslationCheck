@@ -8,3 +8,9 @@ indexes:
   properties:
   - name: section
   - name: ifpattern
+- kind: Pattern
+  properties:
+  - name: total_count
+  - name: unapproved_count
+  - name: pattern_length
+    direction: desc

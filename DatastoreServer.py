@@ -3,6 +3,7 @@ from google.cloud import datastore
 from collections import namedtuple
 import time
 import sys
+import itertools
 import simplejson as json
 from XLIFFUpload import *
 from XLIFFToXLSX import process_xliff_soup
@@ -59,6 +60,22 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=30, offset=0):
     # Populate entries with strings
     return [v for v in executor.map(lambda result: populate(lang, result), query_iter)
             if v is not None]
+
+
+@route('/apiv3/long-strings/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    offset = 0 # Maybe TODO later
+    # Stage 1: Find 
+    query = client.query(kind='Pattern', namespace=lang)
+    query.add_filter('total_count', '=', 1)
+    query.add_filter('unapproved_count', '=', 1)
+    query.order = ['-pattern_length']
+    query_iter = query.fetch(100, offset=offset)
+    # Ignore the patterns, put ALL the strings into a list
+    return itertools.chain(*(v["strings"] for v in executor.map(lambda result: populate(lang, result), query_iter)
+            if v is not None))
+
 
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])

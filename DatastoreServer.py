@@ -136,13 +136,20 @@ def index(lang):
     patterns.
     """
     info = json.load(request.body)
-    english = info["english"]
-    translated = info["translated"]
+    # Either those two ...
+    english = info.get("english", None)
+    translated = info.get("translated", None)
+    # ... or those two
+    englPattern = info.get("englishPattern", None)
+    translatedPattern = info.get("translatedPattern", None)
+    # this one always
     strings = info["strings"]
     # Create a single pattern / pattern translation pair from the string
-    tmp = IFPatternAutotranslator(lang)
-    englPattern, _, _ = tmp.normalize(english)
-    translatedPattern, _, _ = tmp.normalize(translated)
+    # (unless the user already supplied a translated pattern)
+    if translatedPattern is None:
+        tmp = IFPatternAutotranslator(lang)
+        englPattern, _, _ = tmp.normalize(english)
+        translatedPattern, _, _ = tmp.normalize(translated)
     # Generate 
     ifpatterns = {
         englPattern: translatedPattern

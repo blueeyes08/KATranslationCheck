@@ -16,6 +16,7 @@ from AutoTranslationTranslator import *
 from bottle import route, run, request, response
 from DatastoreIndexPatterns import index_pattern
 from DatastoreUtils import DatastoreChunkClient
+from UliEngineering.SignalProcessing.Selection import *
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
@@ -36,24 +37,36 @@ def enable_cors(fn):
     return _enable_cors
 
 def populate(lang, pattern):
-    all_ids = pattern.get("untranslated", []) + pattern.get("translated", [])
+    all_ids = pattern.get("untranslated", []) + pattern.get("translated", []) + pattern.get("approved", [])
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
     entries, _ = chunkClient.get_multi(all_keys)
 
     for entry in entries:
         entry["id"] = entry.key.id_or_name
 
-    # Filter out already-approved strings
-    entries = [entry for entry in entries if not entry["is_approved"]]
-    # If there are no leftover strings, reindex that pattern.
-    if len(entries) == 0:
+    # Split into approved and non-approved strings
+    nonApproved = [entry for entry in entries if not entry["is_approved"]]
+    approved = [entry for entry in entries if entry["is_approved"]]
+
+    # Try to find existing translation pattern
+
+    translation = None
+    if approved:
+        translator = IFPatternAutotranslator(lang)
+        # [0]: Only translation, ignore before and after strings
+        normalized = [translator.normalize(entry["target"])[0] for entry in approved]
+        translation = majority_vote(normalized)
+
+    # If there are no leftover strings, reindex that pattern asynchronous
+    if len(nonApproved) == 0:
         print("Empty pattern, reindexing")
         executor.submit(index_pattern, client, lang, pattern["pattern"], pattern["section"])
         return None
     # Map pattern
     return {
         "pattern": pattern.key.name,
-        "strings": entries
+        "strings": nonApproved,
+        "translation": translation
     }
 
 def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0):

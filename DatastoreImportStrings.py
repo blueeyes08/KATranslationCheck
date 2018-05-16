@@ -18,7 +18,7 @@ decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 def write_entry(obj, lang):
     key = client.key('String', obj["id"], namespace=lang)
     del obj["id"]
-    entity = datastore.Entity(key)
+    entity = client.get(key) or datastore.Entity(key)
     entity.update(obj)
     client.put(entity)
 

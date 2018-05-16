@@ -233,10 +233,11 @@ def index(lang):
 @route('/apiv3/correctable-strings/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
-    offset = int(request.query.offset) or 0
+    offset = int(request.query.offset or '0')
     rule = request.query.rule or "has_decimal_point"
     query = client.query(kind='String', namespace=lang)
     query.add_filter(rule, '=', True)
+    query.add_filter('is_approved', '=', True)
     query.order = ['source_length']
     query_iter = query.fetch(100, offset=offset)
 

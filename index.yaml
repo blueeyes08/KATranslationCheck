@@ -18,3 +18,7 @@ indexes:
   properties:
   - name: has_decimal_point
   - name: source_length
+- kind: String
+  properties:
+  - name: has_decimal_point_override
+  - name: source_length

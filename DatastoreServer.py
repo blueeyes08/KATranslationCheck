@@ -238,28 +238,28 @@ def index(lang):
     query = client.query(kind='String', namespace=lang)
     query.add_filter(rule, '=', True)
     query.add_filter('is_approved', '=', True)
+    query.add_filter(rule + '_override', '=', False)
     query.order = ['source_length']
-    query_iter = query.fetch(100, offset=offset)
+    query_iter = query.fetch(250, offset=offset)
 
     entries = list(query_iter)
     for entry in entries:
         entry["id"] = entry.key.id_or_name
     return json.dumps([dict(entry) for entry in entries])
 
-
 # Mark string as correct i.e. ignore rule for that string in the future
-@route('/apiv3/mark-as-correct/<lang>', method=['OPTIONS', 'GET'])
+@route('/apiv3/override-rule/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
     stringid = int(request.query.id)
     rule = request.query.rule or "has_decimal_point"
-    key = client.key(kind='String', stringid, namespace=lang)
+    key = client.key('String', stringid, namespace=lang)
     string = client.get(key)
     string.update({
         rule + "_override": True
     })
-    client.put(key)
-
+    client.put(string)
+    return json.dumps({"status": "ok"})
 
 @route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

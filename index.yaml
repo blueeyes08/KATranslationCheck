@@ -14,3 +14,7 @@ indexes:
   - name: num_unapproved
   - name: pattern_length
     direction: desc
+- kind: String
+  properties:
+  - name: has_decimal_point
+  - name: source_length

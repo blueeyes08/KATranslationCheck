@@ -225,6 +225,23 @@ def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findTexttags(lang, offset))
 
+
+@route('/apiv3/correctable-strings/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    offset = request.query.offset or 0
+    rule = request.query.rule or "has_decimal_point"
+    query = client.query(kind='String', namespace=lang)
+    query.add_filter(rule, '=', True)
+    query.order = ['source_length']
+    query_iter = query.fetch(100, offset=offset)
+
+    entries = list(query_iter)
+    for entry in entries:
+        entry["id"] = entry.key.id_or_name
+    return json.dumps([dict(entry) for entry in entries])
+
+
 @route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
 def index(lang):

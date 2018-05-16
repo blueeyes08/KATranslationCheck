@@ -17,8 +17,10 @@ indexes:
 - kind: String
   properties:
   - name: has_decimal_point
+  - name: has_decimal_point_override
   - name: source_length
 - kind: String
   properties:
-  - name: has_decimal_point_override
+  - name: has_enclosed_comma_outside_math
+  - name: has_enclosed_comma_outside_math_override
   - name: source_length

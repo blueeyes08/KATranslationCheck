@@ -240,7 +240,7 @@ def index(lang):
     query.add_filter('is_approved', '=', True)
     query.add_filter(rule + '_override', '=', False)
     query.order = ['source_length']
-    query_iter = query.fetch(100, offset=offset)
+    query_iter = query.fetch(250, offset=offset)
 
     entries = list(query_iter)
     for entry in entries:

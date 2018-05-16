@@ -2,6 +2,7 @@
 from google.cloud import datastore
 from collections import namedtuple
 import time
+import re
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
@@ -10,6 +11,8 @@ from AutoTranslationTranslator import IFPatternAutotranslator
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
+
+decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 
 # Create & store an entity
 def write_entry(obj, lang):
@@ -41,7 +44,8 @@ def export_lang_to_db(lang, filt):
                 "ifpattern": normalized,
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
-                "section": section
+                "section": section,
+                "has_decimal_point": entry.IsTranslated and (decimal_point_regex.search(entry.Translated) is not None)
             }
             # Async write
             executor.submit(write_entry, obj, lang)

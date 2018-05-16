@@ -15,6 +15,7 @@ from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
 from DatastoreIndexPatterns import index_pattern
+from DatastoreImportStrings import string_update_rules
 from DatastoreUtils import DatastoreChunkClient
 from UliEngineering.SignalProcessing.Selection import *
 
@@ -111,8 +112,8 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
         key = client.key('String', sid, namespace=lang)
         value = client.get(key)
         value.update({
-            "translation": newTranslation,
-            "translation_source": src
+            "target": newTranslation,
+            "source": src
         })
         if just_translated:
             value.update({
@@ -122,6 +123,9 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
             value.update({
                 "is_approved": True
             })
+        # Update rules
+        string_update_rules(value)
+        print(value)
         client.put(value)
     except Exception as ex:
         traceback.print_exc()

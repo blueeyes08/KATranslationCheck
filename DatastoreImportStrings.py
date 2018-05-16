@@ -22,6 +22,9 @@ def write_entry(obj, lang):
     entity.update(obj)
     client.put(entity)
 
+def string_update_rules(obj):
+    obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
+
 def export_lang_to_db(lang, filt):
     count = 0
     ifTranslator = IFPatternAutotranslator(lang)
@@ -45,7 +48,6 @@ def export_lang_to_db(lang, filt):
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
                 "section": section,
-                "has_decimal_point": entry.IsTranslated and (decimal_point_regex.search(entry.Translated) is not None)
             }
             # Async write
             executor.submit(write_entry, obj, lang)

@@ -49,6 +49,8 @@ def export_lang_to_db(lang, filt):
                 "fileid": entry.FileID,
                 "section": section,
             }
+            # Update rule flags
+            string_update_rules(obj)
             # Async write
             executor.submit(write_entry, obj, lang)
             # Stats

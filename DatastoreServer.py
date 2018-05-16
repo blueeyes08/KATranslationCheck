@@ -113,7 +113,7 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
         value = client.get(key)
         value.update({
             "target": newTranslation,
-            "source": src
+            "translation_source": src
         })
         if just_translated:
             value.update({

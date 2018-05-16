@@ -24,6 +24,7 @@ def write_entry(obj, lang):
 
 def string_update_rules(obj):
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
+    obj["has_decimal_point_override"] = False
 
 def export_lang_to_db(lang, filt):
     count = 0

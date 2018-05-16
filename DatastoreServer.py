@@ -247,6 +247,20 @@ def index(lang):
     return json.dumps([dict(entry) for entry in entries])
 
 
+# Mark string as correct i.e. ignore rule for that string in the future
+@route('/apiv3/mark-as-correct/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    stringid = int(request.query.id)
+    rule = request.query.rule or "has_decimal_point"
+    key = client.key(kind='String', stringid, namespace=lang)
+    string = client.get(key)
+    string.update({
+        rule + "_override": True
+    })
+    client.put(key)
+
+
 @route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
 def index(lang):

@@ -38,7 +38,9 @@ def enable_cors(fn):
     return _enable_cors
 
 def populate(lang, pattern):
-    all_ids = pattern.get("untranslated", []) + pattern.get("translated", []) + pattern.get("approved", [])
+    unapproved_ids = (pattern.get("untranslated", []) + pattern.get("translated", []))[:500]
+    approved_ids = pattern.get("approved", [])[:250]
+    all_ids = unapproved_ids + approved_ids
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
     entries, _ = chunkClient.get_multi(all_keys)
 

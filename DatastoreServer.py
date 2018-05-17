@@ -236,6 +236,12 @@ def index(lang):
     executor.submit(delayedIndexPattern, lang, pattern, delay=0)
     return json.dumps({"status": "ok"})
 
+@route('/apiv3/texttag/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    texttag = request.query.texttag or ""
+    texttag = client.get(client.key('Texttag', texttag, namespace=lang))
+    return json.dumps(texttag or {})
 
 @route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors

@@ -14,6 +14,7 @@ executor = ThreadPoolExecutor(512)
 
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
+double_comma_regex = re.compile(r"(,|\{,\})\d+(,|\{,\})")
 
 # Create & store an entity
 def write_entry(obj, lang):
@@ -26,17 +27,26 @@ def write_entry(obj, lang):
 
 def string_update_rules(obj):
     #
-    if not obj["has_decimal_point_override"]:
+    if not obj.get("has_decimal_point_override", None):
         obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
         obj["has_decimal_point_override"] = False
     #
-    if not obj["has_enclosed_comma_outside_math_override"]:
+    if not obj.get("has_enclosed_comma_outside_math_override", None):
         obj["has_enclosed_comma_outside_math"] = obj["is_translated"] and "{,}" in obj["target"] and "$" not in obj["target"]
         obj["has_enclosed_comma_outside_math_override"] = False
     #
-    if not obj["has_coordinate_without_pipe_override"]:
+    if not obj.get("has_coordinate_without_pipe_override", None):
         obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
         obj["has_coordinate_without_pipe_override"] = False
+    #
+    if not obj.get("has_coordinate_without_pipe_override", None):
+        obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
+        obj["has_coordinate_without_pipe_override"] = False
+        obj["has_coordinate_without_pipe_override"] = False
+    #
+    if not obj.get("has_double_comma_override", None):
+        obj["has_double_comma"] = obj["is_translated"] and (double_comma_regex.search(obj["target"]) is not None)
+        obj["has_double_comma_override"] = False
 
 
 def export_lang_to_db(lang, filt):

@@ -28,19 +28,19 @@ def write_entry(obj, lang):
 def string_update_rules(obj):
     #
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
-    if not obj.get("has_decimal_point_override", None):
+    if "has_decimal_point_override" not in obj:
         obj["has_decimal_point_override"] = False
     #
     obj["has_enclosed_comma_outside_math"] = obj["is_translated"] and "{,}" in obj["target"] and "$" not in obj["target"]
-    if not obj.get("has_enclosed_comma_outside_math_override", None):
+    if "has_enclosed_comma_outside_math_override" not in obj:
         obj["has_enclosed_comma_outside_math_override"] = False
     #
     obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
-    if not obj.get("has_coordinate_without_pipe_override", None):
+    if "has_coordinate_without_pipe_override" not in obj:
         obj["has_coordinate_without_pipe_override"] = False
     #
     obj["has_double_comma"] = obj["is_translated"] and (double_comma_regex.search(obj["target"]) is not None)
-    if not obj.get("has_double_comma", None):
+    if "has_double_comma" not in obj:
         obj["has_double_comma_override"] = False
 
 

@@ -13,6 +13,7 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
+coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
 
 # Create & store an entity
 def write_entry(obj, lang):
@@ -27,8 +28,11 @@ def string_update_rules(obj):
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
     obj["has_decimal_point_override"] = False
     #
-    obj["has_enclosed_comma_outside_math"] = "{,}" in obj["target"] and "$" not in obj["target"]
+    obj["has_enclosed_comma_outside_math"] = obj["is_translated"] and "{,}" in obj["target"] and "$" not in obj["target"]
     obj["has_enclosed_comma_outside_math_override"] = False
+    # 
+    obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
+    obj["has_coordinate_without_pipe_override"] = False
 
 
 def export_lang_to_db(lang, filt):

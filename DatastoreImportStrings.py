@@ -14,7 +14,7 @@ executor = ThreadPoolExecutor(512)
 
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
-double_comma_regex = re.compile(r"(,|\{,\})\d+(,|\{,\})")
+double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
 
 # Create & store an entity
 def write_entry(obj, lang):

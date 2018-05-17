@@ -39,7 +39,7 @@ def string_update_rules(obj):
         obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
         obj["has_coordinate_without_pipe_override"] = False
     #
-    if not obj.get("has_double_comma_override", None):
+    if not obj.get("has_double_comma", None):
         obj["has_double_comma"] = obj["is_translated"] and (double_comma_regex.search(obj["target"]) is not None)
         obj["has_double_comma_override"] = False
 

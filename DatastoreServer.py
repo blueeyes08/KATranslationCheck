@@ -38,7 +38,7 @@ def enable_cors(fn):
     return _enable_cors
 
 def populate(lang, pattern):
-    unapproved_ids = (pattern.get("untranslated", []) + pattern.get("translated", []))[:500]
+    unapproved_ids = (pattern.get("untranslated", []) + pattern.get("translated", []))[:250]
     approved_ids = pattern.get("approved", [])[:250]
     all_ids = unapproved_ids + approved_ids
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
@@ -72,14 +72,26 @@ def populate(lang, pattern):
         "translation": translation
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
     # Populate entries with strings
-    return [v for v in executor.map(lambda result: populate(lang, result), query_iter)
+
+    # Limit number of strings to total_limit
+    patterns = [v for v in executor.map(lambda result: populate(lang, result), query_iter)
             if v is not None]
+    result = []
+    string_count = 0
+    for pattern in patterns:
+        result.append(pattern)
+        string_count += len(pattern["strings"])
+        print(string_count)
+        if string_count > total_limit:
+            break
+
+    return result
 
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])

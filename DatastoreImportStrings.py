@@ -21,8 +21,8 @@ def write_entry(obj, lang):
     key = client.key('String', obj["id"], namespace=lang)
     del obj["id"]
     entity = client.get(key) or datastore.Entity(key)
-    string_update_rules(obj)
     entity.update(obj)
+    string_update_rules(entity)
     client.put(entity)
 
 def string_update_rules(obj):

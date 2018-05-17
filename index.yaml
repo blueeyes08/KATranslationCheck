@@ -29,3 +29,8 @@ indexes:
   - name: has_coordinate_without_pipe
   - name: has_coordinate_without_pipe_override
   - name: source_length
+- kind: String
+  properties:
+  - name: has_double_comma
+  - name: has_double_comma_override
+  - name: source_length

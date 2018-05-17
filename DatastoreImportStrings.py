@@ -27,7 +27,7 @@ def string_update_rules(obj):
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
     obj["has_decimal_point_override"] = False
     #
-    obj["has_enclosed_comma_outside_math"] = "{,}" in obj["target"] and not "$" in obj["target"]
+    obj["has_enclosed_comma_outside_math"] = "{,}" in obj["target"] and "$" not in obj["target"]
     obj["has_enclosed_comma_outside_math_override"] = False
 
 

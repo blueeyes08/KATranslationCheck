@@ -20,19 +20,23 @@ def write_entry(obj, lang):
     key = client.key('String', obj["id"], namespace=lang)
     del obj["id"]
     entity = client.get(key) or datastore.Entity(key)
+    string_update_rules(obj)
     entity.update(obj)
     client.put(entity)
 
 def string_update_rules(obj):
     #
-    obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
-    obj["has_decimal_point_override"] = False
+    if not obj["has_decimal_point_override"]:
+        obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
+        obj["has_decimal_point_override"] = False
     #
-    obj["has_enclosed_comma_outside_math"] = obj["is_translated"] and "{,}" in obj["target"] and "$" not in obj["target"]
-    obj["has_enclosed_comma_outside_math_override"] = False
-    # 
-    obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
-    obj["has_coordinate_without_pipe_override"] = False
+    if not obj["has_enclosed_comma_outside_math_override"]:
+        obj["has_enclosed_comma_outside_math"] = obj["is_translated"] and "{,}" in obj["target"] and "$" not in obj["target"]
+        obj["has_enclosed_comma_outside_math_override"] = False
+    #
+    if not obj["has_coordinate_without_pipe_override"]:
+        obj["has_coordinate_without_pipe"] = obj["is_translated"] and (coordinate_regex.search(obj["target"]) is not None)
+        obj["has_coordinate_without_pipe_override"] = False
 
 
 def export_lang_to_db(lang, filt):
@@ -59,8 +63,6 @@ def export_lang_to_db(lang, filt):
                 "fileid": entry.FileID,
                 "section": section,
             }
-            # Update rule flags
-            string_update_rules(obj)
             # Async write
             executor.submit(write_entry, obj, lang)
             # Stats

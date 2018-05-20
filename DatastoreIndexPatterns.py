@@ -75,9 +75,8 @@ if __name__ == "__main__":
     parser.add_argument('lang', help='The crowdin lang code')
     args = parser.parse_args()
 
-
     client = datastore.Client(project="watts-198422")
-    executor = ThreadPoolExecutor(512)
+    executor = ThreadPoolExecutor(1024)
 
     index(client, executor, args.lang)
 

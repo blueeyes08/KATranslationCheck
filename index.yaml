@@ -34,3 +34,9 @@ indexes:
   - name: has_double_comma
   - name: has_double_comma_override
   - name: source_length
+- kind: String
+  properties:
+  - name: has_literal_dollar
+  - name: has_literal_dollar_override
+  - name: source_length
+

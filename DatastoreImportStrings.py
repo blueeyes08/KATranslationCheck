@@ -52,7 +52,6 @@ def write_entry(obj, lang):
         del obj["id"]
         entity = client.get(key) or datastore.Entity(key)
         entity.update(merge(obj, entity))
-        print(entity)
         string_update_rules(lang, entity)
         client.put(entity)
     except Exception as ex:

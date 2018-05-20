@@ -177,6 +177,8 @@ def updateTranslation(args):
     # Collect valid downloadable files for parallel processing
     fileinfos = []
     for filename, fileinfo in translationFilemap.items():
+        if "draft" in filename:
+            continue
         filepath = os.path.join("cache", args.language, fileinfo["path"])
         # Handle XLIFF filenames
         if not args.po:

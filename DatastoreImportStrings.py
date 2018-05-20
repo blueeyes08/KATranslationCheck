@@ -86,7 +86,7 @@ def string_update_rules(lang, obj):
     ###
     ### Update pattern
     ###
-    normalized, _, _ = genericIFTranslator.normalize(obj["target"])
+    normalized, _, _ = genericIFTranslator.normalize(obj["source"])
     obj["normalized"] = normalized
     ###
     ### Update keywords

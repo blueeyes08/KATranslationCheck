@@ -4,10 +4,6 @@ indexes:
   - name: approved_in_ui
   - name: unapproved_count
     direction: desc
-- kind: String
-  properties:
-  - name: section
-  - name: ifpattern
 - kind: Pattern
   properties:
   - name: num_total

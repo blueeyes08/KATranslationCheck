@@ -2,6 +2,7 @@
 from google.cloud import datastore
 from collections import namedtuple
 import time
+import traceback
 import re
 import nltk
 from XLIFFToXLSX import process_xliff_soup
@@ -45,12 +46,15 @@ relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articl
 
 # Create & store an entity
 def write_entry(obj, lang):
-    key = client.key('String', obj["id"], namespace=lang)
-    del obj["id"]
-    entity = client.get(key) or datastore.Entity(key)
-    entity.update(obj)
-    string_update_rules(lang, entity)
-    client.put(entity)
+    try:
+        key = client.key('String', obj["id"], namespace=lang)
+        del obj["id"]
+        entity = client.get(key) or datastore.Entity(key)
+        print(entity)
+        string_update_rules(lang, entity)
+        client.put(entity)
+    except Exception as ex:
+        traceback.print_exc()
 
 def string_update_rules(lang, obj):
     #
@@ -87,6 +91,7 @@ def string_update_rules(lang, obj):
     obj["words"] = set((v.lower() for v in filter(lambda s: s.isalpha(), raw_words)))
     if lang in nltk_stopwords_langmap:
         obj["words"] -= nltk_stopwords_langmap[lang]
+    obj["words"] = list(obj["words"])
 
 def export_lang_to_db(lang, filt):
     count = 0

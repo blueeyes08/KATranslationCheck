@@ -17,6 +17,20 @@ coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a
 double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
 literal_dollar_regex = re.compile(r"\\\\$")
 
+relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articles.xliff",
+    "2_high_priority_content/learn.math.early-math.exercises.xliff",
+    "2_high_priority_content/learn.math.early-math.xliff",
+    "2_high_priority_content/learn.math.early-math.videos.xliff",
+    "2_high_priority_content/learn.math.arithmetic.articles.xliff",
+    "2_high_priority_content/learn.math.arithmetic.exercises.xliff",
+    "2_high_priority_content/learn.math.arithmetic.xliff",
+    "2_high_priority_content/learn.math.arithmetic.videos.xliff",
+    "2_high_priority_content/learn.math.pre-algebra.articles.xliff",
+    "2_high_priority_content/learn.math.pre-algebra.exercises.xliff",
+    "2_high_priority_content/learn.math.pre-algebra.xliff",
+    "2_high_priority_content/learn.math.pre-algebra.videos.xliff",
+    "1_high_priority_platform/_other_.xliff"]
+
 # Create & store an entity
 def write_entry(obj, lang):
     key = client.key('String', obj["id"], namespace=lang)
@@ -57,7 +71,12 @@ def export_lang_to_db(lang, filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
         section = canonicalFilename.partition("/")[0]
-        print(black(file, bold=True))
+        # relevant_for_live
+        relevant_for_live = False
+        if canonicalFilename in relevant_for_live_files:
+            relevant_for_live = True
+                
+
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
             normalized, _, _ = ifTranslator.normalize(entry.Source)
@@ -73,6 +92,7 @@ def export_lang_to_db(lang, filt):
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
                 "section": section,
+                "relevant_for_live": relevant_for_live
             }
             # Async write
             executor.submit(write_entry, obj, lang)

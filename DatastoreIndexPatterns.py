@@ -29,7 +29,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     query = client.query(kind='String', namespace=lang)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', True)
-    query.add_filter('ifpattern', '=', pattern)
+    query.add_filter('normalized', '=', pattern)
     query.projection = []
     query_iter = query.fetch()
     # ... and add them to the list

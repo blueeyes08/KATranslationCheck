@@ -31,10 +31,11 @@ def delete_all(lang, kind):
     for result in query_iter:
         count += 1
         futures.append(executor.submit(delete, result.key))
+        if count % 5000 == 0:
+            print("Deleted {} {}s".format(count, kind))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass
-    print("Deleted {} {}s".format(count, kind))
 
 if __name__ == "__main__":
     import argparse

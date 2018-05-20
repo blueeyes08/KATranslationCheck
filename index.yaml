@@ -12,6 +12,10 @@ indexes:
     direction: desc
 - kind: String
   properties:
+  - name: is_approved
+  - name: source_length
+- kind: String
+  properties:
   - name: has_decimal_point
   - name: has_decimal_point_override
   - name: source_length

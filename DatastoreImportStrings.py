@@ -23,6 +23,8 @@ nltk_stopwords_langmap = {
     "sv-SE": set(stopwords.words("swedish") + generic_stopwords)
 }
 
+string_exclude_from_indexes = ('source', 'target', )
+
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 
@@ -50,7 +52,7 @@ def write_entry(obj, lang):
     try:
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
-        entity = client.get(key) or datastore.Entity(key)
+        entity = client.get(key) or datastore.Entity(key, exclude_from_indexes=string_exclude_from_indexes)
         entity.update(merge(obj, entity))
         string_update_rules(lang, entity)
         client.put(entity)
@@ -122,7 +124,6 @@ def export_lang_to_db(lang, filt):
                 "translation_source": "Crowdin",
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
-                "section": section,
                 "relevant_for_live": relevant_for_live
             }
             # Async write

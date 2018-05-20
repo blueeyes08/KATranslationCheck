@@ -10,9 +10,11 @@ import concurrent.futures
 from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
+pattern_exclude_from_indexes = ('pattern', 'approved', 'translated', 'untranslated')
+
 def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     key = client.key('Pattern', pattern, namespace=lang)
-    patternInfo = datastore.Entity(key)
+    patternInfo = datastore.Entity(key, exclude_from_indexes=pattern_exclude_from_indexes)
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,

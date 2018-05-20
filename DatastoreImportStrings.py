@@ -9,6 +9,7 @@ from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black, green
+from toolz.dicttoolz import merge
 from AutoTranslationTranslator import IFPatternAutotranslator
 from nltk.corpus import stopwords
 
@@ -50,6 +51,7 @@ def write_entry(obj, lang):
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
         entity = client.get(key) or datastore.Entity(key)
+        entity.update(merge(obj, entity))
         print(entity)
         string_update_rules(lang, entity)
         client.put(entity)

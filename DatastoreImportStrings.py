@@ -88,11 +88,12 @@ def string_update_rules(lang, obj):
     ###
     ### Update keywords
     ###
-    raw_words = nltk.word_tokenize(obj["target"])
-    obj["words"] = set((v.lower() for v in filter(lambda s: s.isalpha(), raw_words)))
-    if lang in nltk_stopwords_langmap:
-        obj["words"] -= nltk_stopwords_langmap[lang]
-    obj["words"] = list(obj["words"])
+    if obj["is_translated"]:
+        raw_words = nltk.word_tokenize(obj["target"])
+        obj["words"] = set((v.lower() for v in filter(lambda s: s.isalpha(), raw_words)))
+        if lang in nltk_stopwords_langmap:
+            obj["words"] -= nltk_stopwords_langmap[lang]
+        obj["words"] = list(obj["words"])
 
 def export_lang_to_db(lang, filt):
     count = 0

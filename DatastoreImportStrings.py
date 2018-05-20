@@ -59,6 +59,8 @@ def write_entry(obj, lang):
     except Exception as ex:
         traceback.print_exc()
 
+genericIFTranslator = IFPatternAutotranslator("de")
+
 def string_update_rules(lang, obj):
     #
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
@@ -84,8 +86,7 @@ def string_update_rules(lang, obj):
     ###
     ### Update pattern
     ###
-    ifTranslator = IFPatternAutotranslator(lang)
-    normalized, _, _ = ifTranslator.normalize(obj["target"])
+    normalized, _, _ = genericIFTranslator.normalize(obj["target"])
     obj["normalized"] = normalized
     ###
     ### Update keywords

@@ -51,16 +51,16 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
 
 def index(client, executor, lang):
     query = client.query(kind='String', namespace=lang)
-    query.distinct_on = ['ifpattern']
-    query.projection = ['ifpattern']
+    query.distinct_on = ['normalized']
+    query.projection = ['normalized']
     query_iter = query.fetch()
     count = 0
     futures = []
     for result in query_iter:
         count += 1
         # Index with and without relevant_for_live
-        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"], True))
-        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"], False))
+        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], True))
+        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], False))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass

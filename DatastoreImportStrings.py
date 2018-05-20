@@ -87,7 +87,7 @@ def string_update_rules(lang, obj):
     ### Update pattern
     ###
     normalized, _, _ = genericIFTranslator.normalize(obj["source"])
-    obj["normalized"] = normalized
+    obj["normalized"] = normalized[:1499] # Limit length due to datastore limitation
     ###
     ### Update keywords
     ###

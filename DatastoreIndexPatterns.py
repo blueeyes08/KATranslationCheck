@@ -47,10 +47,8 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     # Write to DB
     client.put(patternInfo)
 
-def index(client, executor, lang, section):
+def index(client, executor, lang):
     query = client.query(kind='String', namespace=lang)
-    if section:
-        query.add_filter('section', '=', section)
     query.distinct_on = ['ifpattern']
     query.projection = ['ifpattern']
     query_iter = query.fetch()
@@ -70,12 +68,11 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', help='The crowdin lang code')
-    parser.add_argument('-s', '--section', default="2_high_priority_content", help='The section to index for')
     args = parser.parse_args()
 
 
     client = datastore.Client(project="watts-198422")
     executor = ThreadPoolExecutor(512)
 
-    index(client, executor, args.lang, args.section)
+    index(client, executor, args.lang)
 

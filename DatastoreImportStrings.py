@@ -75,7 +75,6 @@ def export_lang_to_db(lang, filt):
         relevant_for_live = False
         if canonicalFilename in relevant_for_live_files:
             relevant_for_live = True
-                
 
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):

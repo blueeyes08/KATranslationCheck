@@ -165,7 +165,7 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
                 "is_approved": True
             })
         # Update rules
-        string_update_rules(value)
+        string_update_rules(lang, value)
         print(value)
         client.put(value)
     except Exception as ex:

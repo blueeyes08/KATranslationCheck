@@ -3,11 +3,23 @@ from google.cloud import datastore
 from collections import namedtuple
 import time
 import re
+import nltk
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
 from ansicolor import black, green
 from AutoTranslationTranslator import IFPatternAutotranslator
+from nltk.corpus import stopwords
+
+nltk.download("punkt")
+nltk.download("stopwords")
+
+generic_stopwords = ["https", "nbsp"]
+
+nltk_stopwords_langmap = {
+    "de": set(stopwords.words("german") + generic_stopwords),
+    "sv-SE": set(stopwords.words("swedish") + generic_stopwords)
+}
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
@@ -37,10 +49,10 @@ def write_entry(obj, lang):
     del obj["id"]
     entity = client.get(key) or datastore.Entity(key)
     entity.update(obj)
-    string_update_rules(entity)
+    string_update_rules(lang, entity)
     client.put(entity)
 
-def string_update_rules(obj):
+def string_update_rules(lang, obj):
     #
     obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
     if "has_decimal_point_override" not in obj:
@@ -62,11 +74,22 @@ def string_update_rules(obj):
     obj["has_literal_dollar"] = obj["is_translated"] and (literal_dollar_regex.search(obj["target"]) is not None)
     if "has_literal_dollar" not in obj:
         obj["has_literal_dollar_override"] = False
-
+    ###
+    ### Update pattern
+    ###
+    ifTranslator = IFPatternAutotranslator(lang)
+    normalized, _, _ = ifTranslator.normalize(obj["target"])
+    obj["normalized"] = normalized
+    ###
+    ### Update keywords
+    ###
+    raw_words = nltk.word_tokenize(obj["target"])
+    obj["words"] = set((v.lower() for v in filter(lambda s: s.isalpha(), raw_words)))
+    if lang in nltk_stopwords_langmap:
+        obj["words"] -= nltk_stopwords_langmap[lang]
 
 def export_lang_to_db(lang, filt):
     count = 0
-    ifTranslator = IFPatternAutotranslator(lang)
     for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
@@ -82,7 +105,6 @@ def export_lang_to_db(lang, filt):
         print(black(file, bold=True))
         soup = parse_xliff_file(file)
         for entry in process_xliff_soup(soup, also_approved=True):
-            normalized, _, _ = ifTranslator.normalize(entry.Source)
             obj = {
                 "id": int(entry.ID),
                 "source": entry.Source,
@@ -91,7 +113,6 @@ def export_lang_to_db(lang, filt):
                 "is_translated": entry.IsTranslated,
                 "is_approved": entry.IsApproved,
                 "translation_source": "Crowdin",
-                "ifpattern": normalized,
                 "file": canonicalFilename,
                 "fileid": entry.FileID,
                 "section": section,

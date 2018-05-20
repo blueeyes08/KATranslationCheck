@@ -63,7 +63,9 @@ def populate(lang, pattern):
     # If there are no leftover strings, reindex that pattern asynchronous
     if len(nonApproved) == 0:
         print("Empty pattern, reindexing")
-        executor.submit(index_pattern, client, lang, pattern["pattern"], pattern["section"])
+        # Reindex for both relevant_for_live settings
+        executor.submit(index_pattern, client, lang, pattern["pattern"], True)
+        executor.submit(index_pattern, client, lang, pattern["pattern"], False)
         return None
     # Map pattern
     return {
@@ -72,9 +74,11 @@ def populate(lang, pattern):
         "translation": translation
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=false):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
+    query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
+
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
     # Populate entries with strings
@@ -98,7 +102,8 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_lim
 def index(lang):
     offset = int(request.query.offset) or 0
     n = int(request.query.n) or 20
-    return json.dumps(findCommonPatterns(lang, offset=offset, n=n))
+    onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
+    return json.dumps(findCommonPatterns(lang, offset=offset, n=n, onlyRelevantForLive=onlyRelevantForLive))
 
 @route('/apiv3/extract-texttags-from-strings/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
@@ -233,9 +238,9 @@ def findTexttags(lang, offset=0):
 
 def delayedIndexPattern(lang, pattern, delay=10):
     time.sleep(delay) # Allow DB to sync
-    # We need to fetch the pattern to get the correct section it was indexed with
-    patternEntity = client.get(client.key('Pattern', pattern, namespace=lang))
-    index_pattern(client, lang, pattern, section=patternEntity["section"])
+    # Index with both relevant_for_live settings
+    executor.submit(index_pattern, client, lang, pattern, True)
+    executor.submit(index_pattern, client, lang, pattern, False)
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

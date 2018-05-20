@@ -10,23 +10,23 @@ import concurrent.futures
 from ansicolor import black
 from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
-def index_pattern(client, lang, pattern, section="2_high_priority_content"):
+def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     key = client.key('Pattern', pattern, namespace=lang)
     patternInfo = datastore.Entity(key)
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,
-        "pattern_length": len(pattern),
-        "section": section,
+        "pattern_length": len(pattern)
         # Lists of String IDs
         "approved": [],
         "translated": [],
-        "untranslated": []
+        "untranslated": [],
+        "relevant_for_live": onlyRelevantForLive
     })
     # Find all strings 
     query = client.query(kind='String', namespace=lang)
-    if section:
-        query.add_filter('section', '=', section)
+    if onlyRelevantForLive:
+        query.add_filter('relevant_for_live', '=', True)
     query.add_filter('ifpattern', '=', pattern)
     query.projection = []
     query_iter = query.fetch()
@@ -58,7 +58,9 @@ def index(client, executor, lang, section):
     futures = []
     for result in query_iter:
         count += 1
-        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"], section))
+        # Index with and without relevant_for_live
+        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"], True))
+        futures.append(executor.submit(index_pattern, client, lang, result["ifpattern"], False))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass

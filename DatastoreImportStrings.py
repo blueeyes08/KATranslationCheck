@@ -23,7 +23,7 @@ nltk_stopwords_langmap = {
     "sv-SE": set(stopwords.words("swedish") + generic_stopwords)
 }
 
-string_exclude_from_indexes = ('source', 'target', )
+string_exclude_from_indexes = ('source', 'target')
 
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)

@@ -15,6 +15,7 @@ executor = ThreadPoolExecutor(512)
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
 double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
+literal_dollar_regex = re.compile(r"\\\\$")
 
 # Create & store an entity
 def write_entry(obj, lang):
@@ -42,6 +43,11 @@ def string_update_rules(obj):
     obj["has_double_comma"] = obj["is_translated"] and (double_comma_regex.search(obj["target"]) is not None)
     if "has_double_comma" not in obj:
         obj["has_double_comma_override"] = False
+        obj["has_coordinate_without_pipe_override"] = False
+    #
+    obj["has_literal_dollar"] = obj["is_translated"] and (literal_dollar_regex.search(obj["target"]) is not None)
+    if "has_literal_dollar" not in obj:
+        obj["has_literal_dollar_override"] = False
 
 
 def export_lang_to_db(lang, filt):

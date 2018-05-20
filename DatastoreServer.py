@@ -215,6 +215,7 @@ def index(lang):
 
 
 def submitTexttag(lang, engl, transl):
+    print("Submitting texttag '{}' for {}".format(engl, lang))
     key = client.key('Texttag', engl, namespace=lang)
     obj = client.get(key)
     obj.update({"translated": transl, "approved_in_ui": True})

@@ -74,11 +74,11 @@ def populate(lang, pattern):
         "translation": translation
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=false):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     if onlyRelevantForLive:
-        query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
+        query.add_filter('relevant_for_live', '=', True)
 
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)

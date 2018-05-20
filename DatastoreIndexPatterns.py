@@ -16,7 +16,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,
-        "pattern_length": len(pattern)
+        "pattern_length": len(pattern),
         # Lists of String IDs
         "approved": [],
         "translated": [],

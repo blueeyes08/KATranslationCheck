@@ -253,7 +253,7 @@ def index(lang):
     engl = string['source']
     transl = string['target']
     fileid = string['fileid']
-    pattern = string['ifpattern']
+    pattern = string['normalized']
     stringid = string['id']
     approve = string['approve']
     # Upload to Crowdin

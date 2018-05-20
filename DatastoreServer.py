@@ -87,7 +87,6 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_lim
     for pattern in patterns:
         result.append(pattern)
         string_count += len(pattern["strings"])
-        print(string_count)
         if string_count > total_limit:
             break
 
@@ -100,6 +99,25 @@ def index(lang):
     offset = int(request.query.offset) or 0
     n = int(request.query.n) or 20
     return json.dumps(findCommonPatterns(lang, offset=offset, n=n))
+
+@route('/apiv3/extract-texttags-from-strings/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang):
+    info = json.load(request.body)
+    strings = info["strings"]
+    # Index texttags for pattern
+    tti = TextTagIndexer(lang)
+    for string in strings:
+        tti.add(string["source"])
+    # Fetch texttags
+    keys = [client.key('Texttag', engl, namespace=lang) for engl in tti.index.keys()]
+    texttags = client.get_multi(keys)
+    # Map texttags to number of occurences
+    result = []
+    for texttag in texttags:
+        texttag["count"] = tti.index[texttag["english"]]
+        result.append(texttag)
+    return json.dumps(texttags)
 
 
 @route('/apiv3/long-strings/<lang>', method=['OPTIONS', 'GET'])

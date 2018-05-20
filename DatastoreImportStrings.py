@@ -6,7 +6,7 @@ import re
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
-from ansicolor import black
+from ansicolor import black, green
 from AutoTranslationTranslator import IFPatternAutotranslator
 
 client = datastore.Client(project="watts-198422")
@@ -71,6 +71,9 @@ def export_lang_to_db(lang, filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
         section = canonicalFilename.partition("/")[0]
+        # Dont index drafts
+        if "learn.draft.xliff" in canonicalFilename:
+            print(green("Skipping {}".format(canonicalFilename), bold=True))
         # relevant_for_live
         relevant_for_live = False
         if canonicalFilename in relevant_for_live_files:

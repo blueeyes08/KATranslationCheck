@@ -24,6 +24,7 @@ def delete(key):
 def delete_all(lang, kind):
     query = client.query(kind=kind, namespace=lang)
     query.projection = []
+    query.keys_only()
     query_iter = query.fetch()
     count = 0
     futures = []

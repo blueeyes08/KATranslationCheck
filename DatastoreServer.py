@@ -77,7 +77,8 @@ def populate(lang, pattern):
 def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=false):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
-    query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
+    if onlyRelevantForLive:
+        query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
 
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
@@ -129,10 +130,13 @@ def index(lang):
 @enable_cors
 def index(lang):
     offset = 0 # Maybe TODO later
+    onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
     # Stage 1: Find 
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_total', '=', 1)
     query.add_filter('num_unapproved', '=', 1)
+    if onlyRelevantForLive:
+        query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
     query.order = ['-pattern_length']
     query_iter = query.fetch(250, offset=offset)
     # Ignore the patterns, put ALL the strings into a list

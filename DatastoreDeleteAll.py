@@ -39,6 +39,7 @@ def delete_all(lang, kind):
             current_queue = []
         if count % 5000 == 0:
             print("Deleted {} {}s".format(count, kind))
+    futures.append(executor.submit(delete, current_queue))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass

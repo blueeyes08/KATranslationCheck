@@ -34,10 +34,10 @@ def delete_selective(lang, kind):
         name = result.key.id_or_name
         if name.startswith("live#") or name.startswith("all"):
             count_ok += 1
-            print("OK: ", name)
+            #print("OK: ", name)
             continue
         else: # Key not OK
-            print("NOK: ", name)
+            #print("NOK: ", name)
             count += 1
             futures.append(executor.submit(delete, result.key))
             if count % 5000 == 0:
@@ -45,6 +45,7 @@ def delete_selective(lang, kind):
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass
+    print("Total {} OK and {} NOK".format(count_ok, count))
 
 if __name__ == "__main__":
     import argparse

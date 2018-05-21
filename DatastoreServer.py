@@ -23,6 +23,12 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
 
+
+def get_all_filenames(lang):
+    for file in findXLIFFFiles("cache/{}".format(lang)):
+        # e.g. '1_high_priority_platform/about.donate.xliff'
+        yield "/".join(file.split("/")[2:])
+
 # the decorator
 def enable_cors(fn):
     def _enable_cors(*args, **kwargs):
@@ -96,6 +102,12 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_lim
             break
 
     return result
+
+@route('/apiv3/filenames/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    all_filenames = list(get_all_filenames("de"))
+    return json.dumps(all_filenames)
 
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])

@@ -39,4 +39,8 @@ indexes:
   - name: has_literal_dollar
   - name: has_literal_dollar_override
   - name: source_length
-
+- kind: Pattern
+  properties:
+  - name: relevant_for_live
+  - name: num_unapproved
+    direction: desc

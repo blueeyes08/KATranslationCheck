@@ -2,6 +2,7 @@
 from google.cloud import datastore
 from collections import namedtuple
 import time
+import traceback
 import sys
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
@@ -13,45 +14,49 @@ from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 pattern_exclude_from_indexes = ('pattern', 'approved', 'translated', 'untranslated')
 
 def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
-    prefix = "live" if onlyRelevantForLive else "all"
-    key = client.key('Pattern', "{}#{}".format(prefix, pattern), namespace=lang)
-    patternInfo = datastore.Entity(key, exclude_from_indexes=pattern_exclude_from_indexes)
-    patternInfo.update({
-        "pattern": pattern,
-        "pattern_length": len(pattern),
-        # Lists of String IDs
-        "approved": [],
-        "translated": [],
-        "untranslated": [],
-        "relevant_for_live": onlyRelevantForLive
-    })
-    # Find all strings 
-    query = client.query(kind='String', namespace=lang)
-    if onlyRelevantForLive:
-        query.add_filter('relevant_for_live', '=', True)
-    query.add_filter('normalized', '=', pattern)
-    query.projection = ['is_approved', 'is_translated']
-    query_iter = query.fetch()
-    # ... and add them to the list
-    for result in query_iter:
-        if result["is_approved"]:
-            patternInfo["approved"].append(result.key.id)
-        elif result["is_translated"]:
-            patternInfo["translated"].append(result.key.id)
-        else:
-            patternInfo["untranslated"].append(result.key.id)
-    # Complete stats
-    patternInfo["num_approved"] = len(patternInfo["approved"])
-    patternInfo["num_translated"] = len(patternInfo["translated"])
-    patternInfo["num_untranslated"] = len(patternInfo["untranslated"])
-    patternInfo["num_total"] = patternInfo["num_approved"] + patternInfo["num_translated"] + patternInfo["num_untranslated"]
-    patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
-    # Write to DB
-    if patternInfo["num_total"] >= 2:
-        print("Indexing '{}'".format(pattern))
-        client.put(patternInfo)
-    else: # No strings
-        client.delete(key)
+    try:
+        prefix = "live" if onlyRelevantForLive else "all"
+        key = client.key('Pattern', "{}#{}".format(prefix, pattern), namespace=lang)
+        patternInfo = datastore.Entity(key, exclude_from_indexes=pattern_exclude_from_indexes)
+        patternInfo.update({
+            "pattern": pattern,
+            "pattern_length": len(pattern),
+            # Lists of String IDs
+            "approved": [],
+            "translated": [],
+            "untranslated": [],
+            "relevant_for_live": onlyRelevantForLive
+        })
+        # Find all strings 
+        query = client.query(kind='String', namespace=lang)
+        if onlyRelevantForLive:
+            query.add_filter('relevant_for_live', '=', True)
+        query.add_filter('normalized', '=', pattern)
+        query.projection = ['is_approved', 'is_translated']
+        # ... and add them to the list
+        for result in query.fetch():
+            print(result)
+            if result["is_approved"]:
+                patternInfo["approved"].append(result.key.id)
+            elif result["is_translated"]:
+                patternInfo["translated"].append(result.key.id)
+            else:
+                patternInfo["untranslated"].append(result.key.id)
+        # Complete stats
+        patternInfo["num_approved"] = len(patternInfo["approved"])
+        patternInfo["num_translated"] = len(patternInfo["translated"])
+        patternInfo["num_untranslated"] = len(patternInfo["untranslated"])
+        patternInfo["num_total"] = patternInfo["num_approved"] + patternInfo["num_translated"] + patternInfo["num_untranslated"]
+        patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
+        # Write to DB
+        print(patternInfo["num_total"])
+        if patternInfo["num_total"] >= 2:
+            print("Indexing '{}'".format(pattern))
+            client.put(patternInfo)
+        else: # No strings
+            client.delete(key)
+    except Exception as ex:
+        traceback.print_exc()
 
 def index(client, executor, lang):
     query = client.query(kind='String', namespace=lang)

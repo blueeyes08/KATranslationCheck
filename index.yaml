@@ -67,3 +67,14 @@ indexes:
   properties:
   - name: relevant_for_live
   - name: source_length
+- kind: String
+  properties:
+  - name: normalized
+  - name: relevant_for_live
+  - name: is_approved
+  - name: is_translated
+- kind: String
+  properties:
+  - name: normalized
+  - name: is_approved
+  - name: is_translated

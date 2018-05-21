@@ -358,5 +358,4 @@ def index(lang):
     else: # Success
         return json.dumps({"status": "ok", "translation": transl})
 
-
-run(host='localhost', port=9921)
+run(host='localhost', port=9921, server='paste')

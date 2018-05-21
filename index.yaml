@@ -40,6 +40,6 @@ indexes:
     direction: desc
 - kind: String
   properties:
-  - name: file
+  - name: is_approved
   - name: source_length
     direction: desc

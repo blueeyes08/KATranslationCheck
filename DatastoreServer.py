@@ -146,6 +146,7 @@ def index(lang):
     filenameFilter = request.query.file or None
     # Stage 1: Find 
     query = client.query(kind='String', namespace=lang)
+    query.add_filter('is_approved', '=', False)
     if filenameFilter:
         query.add_filter('file', '=', filenameFilter)
     if onlyRelevantForLive:

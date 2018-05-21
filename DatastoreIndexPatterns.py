@@ -48,7 +48,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     patternInfo["num_total"] = patternInfo["num_approved"] + patternInfo["num_translated"] + patternInfo["num_untranslated"]
     patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
     # Write to DB
-    if patternInfo["num_total"]:
+    if patternInfo["num_total"] >= 2:
         client.put(patternInfo)
     else: # No strings
         client.delete(key)

@@ -53,6 +53,25 @@ def write_entry(obj, lang):
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
         entity = client.get(key) or datastore.Entity(key, exclude_from_indexes=string_exclude_from_indexes)
+        # Update translations
+        if obj["is_translated"] or obj["is_approved"]:
+            # Update everything
+            entity["source"] = obj["source"]
+            entity["target"] = obj["target"]
+            entity["translation_source"] = obj["translation_source"]
+        elif entity["translation_source"] == "BEAST": # Pretranslated
+            # only update if string changed
+            # unsure if this can happen with the same string ID
+            if entity["source"] != obj["source"]:
+                entity["source"] = obj["source"]
+                entity["target"] = obj["target"]
+        else:
+            # Not pretranslated, but not translated
+            # Update "just in case it changed"
+            entity["source"] = obj["source"]
+            entity["target"] = obj["target"]
+            entity["translation_source"] = obj["translation_source"]
+        # Update keys that were previously not present
         entity.update(merge(obj, entity))
         string_update_rules(lang, entity)
         client.put(entity)

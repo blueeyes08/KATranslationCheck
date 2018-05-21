@@ -48,3 +48,22 @@ indexes:
   - name: relevant_for_live
   - name: source_length
     direction: desc
+- kind: String
+  properties:
+  - name: file
+  - name: source_length
+- kind: String
+  properties:
+  - name: file
+  - name: is_approved
+  - name: sourceLength
+    direction: desc
+- kind: String
+  properties:
+  - name: is_approved
+  - name: sourceLength
+    direction: desc
+- kind: String
+  properties:
+  - name: relevant_for_live
+  - name: source_length

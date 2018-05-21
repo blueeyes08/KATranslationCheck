@@ -144,6 +144,7 @@ def index(lang):
     offset = 0 # Maybe TODO later
     onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
     filenameFilter = request.query.file or None
+    sortAsc = request.query.sort == "asc"
     # Stage 1: Find 
     query = client.query(kind='String', namespace=lang)
     query.add_filter('is_approved', '=', False)
@@ -151,7 +152,7 @@ def index(lang):
         query.add_filter('file', '=', filenameFilter)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
-    query.order = ['-source_length']
+    query.order = ['source_length' if sortAsc else '-sourceLength']
     query_iter = query.fetch(100, offset=offset)
 
     longStrings = []
@@ -160,7 +161,7 @@ def index(lang):
         string["id"] = entity.key.id_or_name
         # Remove unneccessary fields
         for key in list(string.keys()):
-            if key.startswith("has_") or key in ["words", "source_length", "fileid", "normalized", "relevant_for_live"]:
+            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
                 del string[key]
         longStrings.append(string)
     # Ignore the patterns, put ALL the strings into a list

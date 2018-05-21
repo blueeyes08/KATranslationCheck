@@ -36,7 +36,9 @@ def pretranslate(client, executor, lang):
     for result in query_iter:
         count += 1
         # Index with and without relevant_for_live
-        futures.append(executor.submit(pretranslate_string, client, lang, result))
+        #futures.append(executor.submit(pretranslate_string, client, lang, result))
+        pretranslate_string(client, lang, result)
+        time.sleep(3)
         if count % 1000 == 0:
             print("Pretranslated {} strings".format(count))
     # Wait for futures to finish

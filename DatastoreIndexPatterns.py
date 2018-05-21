@@ -47,6 +47,10 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         patternInfo["num_untranslated"] = len(patternInfo["untranslated"])
         patternInfo["num_total"] = patternInfo["num_approved"] + patternInfo["num_translated"] + patternInfo["num_untranslated"]
         patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
+        # Limit entity size
+        patternInfo["untranslated"] = patternInfo["untranslated"][:500]
+        patternInfo["translated"] = patternInfo["translated"][:500]
+        patternInfo["approved"] = patternInfo["approved"][:500]
         # Write to DB
         if patternInfo["num_total"] >= 2:
             print("Indexing '{}'".format(pattern))
@@ -83,4 +87,5 @@ if __name__ == "__main__":
     executor = ThreadPoolExecutor(1024)
 
     index(client, executor, args.lang)
+    #index_pattern(client, "de", "§formula§", False)
 

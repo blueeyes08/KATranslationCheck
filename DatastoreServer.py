@@ -52,6 +52,10 @@ def populate(lang, pattern):
 
     for entry in entries:
         entry["id"] = entry.key.id_or_name
+        # Remove unneccessary fields
+        for key in list(entry.keys()):
+            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
+                del entry[key]
 
     # Split into approved and non-approved strings
     nonApproved = [entry for entry in entries if not entry["is_approved"]]
@@ -75,7 +79,7 @@ def populate(lang, pattern):
         return None
     # Map pattern
     return {
-        "pattern": pattern.key.name,
+        "pattern": pattern["pattern"],
         "strings": nonApproved,
         "translation": translation
     }

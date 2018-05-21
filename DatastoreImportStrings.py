@@ -65,6 +65,7 @@ def write_entry(obj, lang):
             if entity["source"] != obj["source"]:
                 entity["source"] = obj["source"]
                 entity["target"] = obj["target"]
+                entity["translation_source"] = obj["translation_source"]
         else:
             # Not pretranslated, but not translated
             # Update "just in case it changed"

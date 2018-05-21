@@ -15,9 +15,9 @@ client = datastore.Client(project="watts-198422")
 
 executor = ThreadPoolExecutor(4096)
 
-def delete(key):
+def delete(keys):
     try:
-        client.delete(key)
+        client.delete_multi(keys)
     except Exception as ex:
         traceback.print_exc()
 
@@ -28,9 +28,15 @@ def delete_all(lang, kind):
     query_iter = query.fetch()
     count = 0
     futures = []
+
+    current_queue = []
+    futures = []
     for result in query_iter:
         count += 1
-        futures.append(executor.submit(delete, result.key))
+        current_queue.append(result.key)
+        if len(current_queue) > 350:
+            futures.append(executor.submit(delete, current_queue))
+            current_queue = []
         if count % 5000 == 0:
             print("Deleted {} {}s".format(count, kind))
     # Wait for futures to finish

@@ -16,7 +16,6 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     prefix = "live" if onlyRelevantForLive else "all"
     key = client.key('Pattern', "{}#{}".format(prefix, pattern), namespace=lang)
     patternInfo = datastore.Entity(key, exclude_from_indexes=pattern_exclude_from_indexes)
-    print("Indexing '{}'".format(pattern))
     patternInfo.update({
         "pattern": pattern,
         "pattern_length": len(pattern),
@@ -49,6 +48,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     patternInfo["num_unapproved"] = patternInfo["num_translated"] + patternInfo["num_untranslated"]
     # Write to DB
     if patternInfo["num_total"] >= 2:
+        print("Indexing '{}'".format(pattern))
         client.put(patternInfo)
     else: # No strings
         client.delete(key)

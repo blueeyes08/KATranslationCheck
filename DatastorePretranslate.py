@@ -37,6 +37,8 @@ def pretranslate(client, executor, lang):
         count += 1
         # Index with and without relevant_for_live
         futures.append(executor.submit(pretranslate_string, client, lang, result))
+        if count % 1000 == 0:
+            print("Pretranslated {} strings".format(count))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass

@@ -4,12 +4,6 @@ indexes:
   - name: approved_in_ui
   - name: unapproved_count
     direction: desc
-- kind: Pattern
-  properties:
-  - name: num_total
-  - name: num_unapproved
-  - name: pattern_length
-    direction: desc
 - kind: String
   properties:
   - name: is_approved
@@ -43,4 +37,9 @@ indexes:
   properties:
   - name: relevant_for_live
   - name: num_unapproved
+    direction: desc
+- kind: String
+  properties:
+  - name: file
+  - name: source_length
     direction: desc

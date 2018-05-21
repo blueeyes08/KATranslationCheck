@@ -22,7 +22,7 @@ from UliEngineering.SignalProcessing.Selection import *
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
-
+default_string_projection = ['source', 'target', 'id', 'file', 'is_translated', 'is_approved', 'translation_source']
 
 def get_all_filenames(lang):
     for file in findXLIFFFiles("cache/{}".format(lang)):
@@ -143,17 +143,26 @@ def index(lang):
 def index(lang):
     offset = 0 # Maybe TODO later
     onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
+    filenameFilter = request.query.file or None
     # Stage 1: Find 
-    query = client.query(kind='Pattern', namespace=lang)
-    query.add_filter('num_total', '=', 1)
-    query.add_filter('num_unapproved', '=', 1)
+    query = client.query(kind='String', namespace=lang)
+    if filenameFilter:
+        query.add_filter('file', '=', filenameFilter)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
-    query.order = ['-pattern_length']
-    query_iter = query.fetch(250, offset=offset)
+    query.order = ['-source_length']
+    query_iter = query.fetch(100, offset=offset)
+
+    longStrings = []
+    for entity in query_iter:
+        string = dict(entity)
+        string["id"] = entity.key.id_or_name
+        # Remove unneccessary fields
+        for key in list(string.keys()):
+            if key.startswith("has_") or key in ["words", "source_length", "fileid", "normalized", "relevant_for_live"]:
+                del string[key]
+        longStrings.append(string)
     # Ignore the patterns, put ALL the strings into a list
-    patterns = [v for v in executor.map(lambda result: populate(lang, result), query_iter) if v is not None]
-    longStrings = list(itertools.chain(*([v["strings"] for v in patterns])))
     return json.dumps(longStrings)
 
 def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", just_translated=False, just_approved=False):

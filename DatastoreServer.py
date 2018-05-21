@@ -156,7 +156,8 @@ def index(lang):
         query.add_filter('file', '=', filenameFilter)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
-    query.order = ['source_length' if sortAsc else '-sourceLength']
+    query.order = ['source_length' if sortAsc else '-source_length']
+    print(query.filters)
     query_iter = query.fetch(100, offset=offset)
 
     longStrings = []
@@ -303,7 +304,6 @@ def index(lang):
 def index(lang):
     offset = request.query.offset or 0
     return json.dumps(findTexttags(lang, offset))
-
 
 @route('/apiv3/correctable-strings/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors

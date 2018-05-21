@@ -31,7 +31,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', True)
     query.add_filter('normalized', '=', pattern)
-    query.projection = []
+    query.projection = ['is_approved', 'is_translated']
     query_iter = query.fetch()
     # ... and add them to the list
     for result in query_iter:

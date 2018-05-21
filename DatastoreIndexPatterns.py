@@ -35,7 +35,6 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         query.projection = ['is_approved', 'is_translated']
         # ... and add them to the list
         for result in query.fetch():
-            print(result)
             if result["is_approved"]:
                 patternInfo["approved"].append(result.key.id)
             elif result["is_translated"]:

@@ -43,3 +43,8 @@ indexes:
   - name: is_approved
   - name: source_length
     direction: desc
+- kind: String
+  properties:
+  - name: relevant_for_live
+  - name: source_length
+    direction: desc

@@ -5,7 +5,7 @@ Description=KATranslationCheck server
 Environment=PORT=%i
 Type=simple
 ExecStart=/usr/bin/python3 DatastoreServer.py
-WorkingDirectory=/mnt/production/KATranslationCheck
+WorkingDirectory=/mnt/KATranslationCheck
 Restart=always
 
 [Install]

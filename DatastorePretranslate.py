@@ -14,7 +14,7 @@ from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 pattern_exclude_from_indexes = ('pattern', 'approved', 'translated', 'untranslated')
 
-def pretranslate_string(client, lang, string):
+def pretranslate_string(client, lang, string, retries_left=3):
     try:
         engl = string['source']
         translator = FullAutoTranslator(lang)
@@ -23,22 +23,26 @@ def pretranslate_string(client, lang, string):
             string["target"] = transl
             string["translation_source"] = "BEAST"
             client.put(string)
+        else:
+            if retries_left > 0:
+                return pretranslate_string(client, lang, string, retries_left-1)
     except Exception as ex:
         traceback.print_exc()
 
-def pretranslate(client, executor, lang):
+def pretranslate(client, executor, lang, file):
     query = client.query(kind='String', namespace=lang)
     query.add_filter('translation_source', '=', 'Crowdin')
     query.add_filter('is_translated', '=', False)
+    if file:
+        query.add_filter('file', '=', file)
     query_iter = query.fetch()
     count = 0
     futures = []
     for result in query_iter:
         count += 1
         # Index with and without relevant_for_live
-        #futures.append(executor.submit(pretranslate_string, client, lang, result))
-        pretranslate_string(client, lang, result)
-        time.sleep(3)
+        futures.append(executor.submit(pretranslate_string, client, lang, result))
+        #pretranslate_string(client, lang, result)
         if count % 1000 == 0:
             print("Pretranslated {} strings".format(count))
     # Wait for futures to finish
@@ -50,11 +54,13 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', help='The crowdin lang code')
+    parser.add_argument('-f','--file', help='File code to filter for')
+    parser.add_argument('-j','--threads', default=3, type=int, help='Number of threads. Reduce on rate error')
     args = parser.parse_args()
 
     client = datastore.Client(project="watts-198422")
-    executor = ThreadPoolExecutor(3)
+    executor = ThreadPoolExecutor(args.threads)
 
-    pretranslate(client, executor, args.lang)
+    pretranslate(client, executor, args.lang, args.file)
     #index_pattern(client, "de", "§formula§", False)
 

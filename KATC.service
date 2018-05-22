@@ -1,5 +1,6 @@
 [Unit]
 Description=KATranslationCheck server
+After=network.target
 
 [Service]
 Environment=PORT=%i

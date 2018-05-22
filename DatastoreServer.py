@@ -2,6 +2,7 @@
 from google.cloud import datastore
 from collections import namedtuple
 import time
+import os
 import sys
 import itertools
 import simplejson as json
@@ -359,4 +360,4 @@ def index(lang):
     else: # Success
         return json.dumps({"status": "ok", "translation": transl})
 
-run(host='localhost', port=9921, server='paste')
+run(host='localhost', port=int(os.getenv('PORT', 9921)), server='paste')

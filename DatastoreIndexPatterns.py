@@ -53,7 +53,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         patternInfo["approved"] = patternInfo["approved"][:500]
         # Write to DB
         if patternInfo["num_total"] >= 2:
-            print("Indexing '{}'".format(pattern))
+            print("Indexing '{}' (relevant_for_live={})".format(pattern, onlyRelevantForLive))
             client.put(patternInfo)
         else: # No strings
             client.delete(key)

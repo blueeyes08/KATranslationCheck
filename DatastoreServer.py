@@ -4,6 +4,7 @@ from collections import namedtuple
 import time
 import os
 import sys
+from ansicolor import black
 import itertools
 import simplejson as json
 from XLIFFUpload import *
@@ -24,6 +25,8 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
 default_string_projection = ['source', 'target', 'id', 'file', 'is_translated', 'is_approved', 'translation_source']
+
+currently_indexing = []
 
 def get_all_filenames(lang):
     for file in findXLIFFFiles("cache/{}".format(lang)):
@@ -270,11 +273,22 @@ def findTexttags(lang, offset=0):
     # Populate entries with strings
     return list(query_iter)
 
-def delayedIndexPattern(lang, pattern, delay=10):
+def delayedIndexPattern(lang, pattern, delay=15):
+    if pattern in currently_indexing:
+        print(black("Ignoring index request for '{}', already in queue".format(pattern), bold=True))
+        return
+    # Avoid duplicate indexing
+    currently_indexing.append(pattern)
+    # Delay
     time.sleep(delay) # Allow DB to sync
     # Index with both relevant_for_live settings
     executor.submit(index_pattern, client, lang, pattern, True)
     executor.submit(index_pattern, client, lang, pattern, False)
+    # Remove from queue
+    try:
+        currently_indexing.remove(pattern)
+    except ValueError:
+        pass
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

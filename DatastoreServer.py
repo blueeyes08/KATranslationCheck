@@ -131,6 +131,7 @@ def index(lang):
     tti = TextTagIndexer(lang)
     for string in strings:
         tti.add(string["source"])
+    del tti.index[""]
     # Fetch texttags
     keys = [client.key('Texttag', engl, namespace=lang) for engl in tti.index.keys()]
     texttags = client.get_multi(keys)

@@ -4,8 +4,9 @@ After=network.target
 
 [Service]
 Environment=PORT=%i
+Environment=GOOGLE_APPLICATION_CREDENTIALS=/mnt/101watts-111cc836b6db.json
 Type=simple
-ExecStart=/usr/bin/python3 DatastoreServer.py
+ExecStart=/bin/bash -c 'python3 DatastoreServer.py'
 WorkingDirectory=/mnt/KATranslationCheck
 Restart=always
 

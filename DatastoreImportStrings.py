@@ -26,7 +26,7 @@ nltk_stopwords_langmap = {
 string_exclude_from_indexes = ('source', 'target', 'fileid')
 
 client = datastore.Client(project="watts-198422")
-executor = ThreadPoolExecutor(512)
+executor = ThreadPoolExecutor(1024)
 
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")

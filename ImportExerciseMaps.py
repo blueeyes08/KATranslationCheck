@@ -46,7 +46,7 @@ def fetch_and_write_exercise_infos(lang, exercise):
     # Create dir
     directory = os.path.join("exercises", lang)
     os.makedirs(directory, exist_ok=True)
-    filename = os.path.join(directory, "exercise.json")
+    filename = os.path.join(directory, "{}.json".format(exercise))
     # Fetch
     try:
         exerciseInfo = fetch_exercise_info(lang, exercise)

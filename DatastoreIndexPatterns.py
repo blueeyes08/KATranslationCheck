@@ -13,7 +13,10 @@ from AutoTranslationIndexer import IgnoreFormulaPatternIndexer
 
 pattern_exclude_from_indexes = ('pattern', 'approved', 'translated', 'untranslated')
 
+total_string_count = 0
+
 def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
+    global total_string_count
     try:
         prefix = "live" if onlyRelevantForLive else "all"
         key = client.key('Pattern', "{}#{}".format(prefix, pattern), namespace=lang)
@@ -53,6 +56,10 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         patternInfo["approved"] = patternInfo["approved"][:500]
         # Write to DB
         if patternInfo["num_total"] >= 2:
+            # Stats
+            if not onlyRelevantForLive:
+                total_string_count += patternInfo["num_total"]
+            # Write
             print("Indexing '{}' (relevant_for_live={})".format(pattern, onlyRelevantForLive))
             client.put(patternInfo)
         else: # No strings
@@ -88,4 +95,5 @@ if __name__ == "__main__":
 
     index(client, executor, args.lang)
     #index_pattern(client, "de", "§formula§", False)
+    print("Total pattern strings: {}".format(total_string_count))
 

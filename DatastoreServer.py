@@ -20,7 +20,10 @@ from DatastoreIndexPatterns import index_pattern
 from DatastoreImportStrings import string_update_rules
 from DatastoreUtils import DatastoreChunkClient
 from UliEngineering.SignalProcessing.Selection import *
+from google.cloud import logging
+logging_client = logging.Client()
 
+logger = logging_client.logger("Babelfish")
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
@@ -306,6 +309,15 @@ def index(lang):
     executor.submit(updateStringTranslation, lang, stringid, transl, just_translated=True, just_approved=approve)
     # Index pattern after allowing the DB to sync
     executor.submit(delayedIndexPattern, lang, pattern, delay=0)
+    # Log
+    logger.log_struct({
+        "type": "string",
+        "lang": lang,
+        "stringid": stringid,
+        "approve": approve,
+        "english": engl,
+        "translated": transl
+    })
     return json.dumps({"status": "ok"})
 
 @route('/apiv3/texttag/<lang>', method=['OPTIONS', 'GET'])

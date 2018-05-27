@@ -166,4 +166,4 @@ def run_game_server(args):
     }
 
     print("Found {} strings".format(len(availableStrings)))
-    run(app, host='0.0.0.0', port=9922)
+    run(app, host='0.0.0.0', port=9822)

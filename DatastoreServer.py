@@ -323,7 +323,7 @@ def index(lang):
         "english": engl,
         "translated": transl,
         "nickname": nickname,
-        "original_translation": string['original_translation'],
+        "original_translation": string.get('original_translation', None),
         "was_translated": string["is_translated"],
         "was_approved": string["is_approved"]
     })

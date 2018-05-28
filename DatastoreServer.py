@@ -63,6 +63,10 @@ def populate(lang, pattern):
         for key in list(entry.keys()):
             if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
                 del entry[key]
+        # Add "original translation field"
+        entry.update({
+            "original_translation": entry["target"]
+        })
 
     # Split into approved and non-approved strings
     nonApproved = [entry for entry in entries if not entry["is_approved"]]
@@ -303,6 +307,7 @@ def index(lang):
     pattern = string['normalized']
     stringid = string['id']
     approve = string['approve']
+    nickname = string.get('nickname') or 'Anonymous'
     # Upload to Crowdin
     executor.submit(upload_string, fileid, lang, stringid, engl, transl, approve)
     # Update in Datastore
@@ -310,13 +315,17 @@ def index(lang):
     # Index pattern after allowing the DB to sync
     executor.submit(delayedIndexPattern, lang, pattern, delay=0)
     # Log
-    logger.log_struct({
+    executor.submit(logger.log_struct, {
         "type": "string",
         "lang": lang,
         "stringid": stringid,
         "approve": approve,
         "english": engl,
-        "translated": transl
+        "translated": transl,
+        "nickname": nickname,
+        "original_translation": string['original_translation'],
+        "was_translated": string["is_translated"],
+        "was_approved": string["is_approved"]
     })
     return json.dumps({"status": "ok"})
 

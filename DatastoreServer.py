@@ -181,6 +181,10 @@ def index(lang):
             if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
                 del string[key]
         longStrings.append(string)
+        # Add "original translation field"
+        entry.update({
+            "original_translation": entry["target"]
+        })
     # Ignore the patterns, put ALL the strings into a list
     return json.dumps(longStrings)
 
@@ -357,6 +361,10 @@ def index(lang):
     entries = list(query_iter)
     for entry in entries:
         entry["id"] = entry.key.id_or_name
+        # Add "original translation field"
+        entry.update({
+            "original_translation": entry["target"]
+        })
     return json.dumps([dict(entry) for entry in entries])
 
 # Mark string as correct i.e. ignore rule for that string in the future

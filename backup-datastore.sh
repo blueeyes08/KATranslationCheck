@@ -15,4 +15,5 @@ echo "Backupping da"
 gcloud beta datastore export --namespaces="da" gs://katc-datastorage-backup-1
 echo "Backupping pt-PT"
 gcloud beta datastore export --namespaces="pt-PT" gs://katc-datastorage-backup-1
-
+echo "Backupping nb"
+cloud beta datastore export --namespaces="nb" gs://katc-datastorage-backup-1

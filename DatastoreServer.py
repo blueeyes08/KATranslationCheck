@@ -373,12 +373,13 @@ def index(lang):
 def index(lang):
     stringid = int(request.query.id)
     rule = request.query.rule or "has_decimal_point"
-    key = client.key('String', stringid, namespace=lang)
-    string = client.get(key)
-    string.update({
-        rule + "_override": True
-    })
-    client.put(string)
+    if rule != 'word_search': # Ignore word search ignore, dont add useless field
+        key = client.key('String', stringid, namespace=lang)
+        string = client.get(key)
+        string.update({
+            rule + "_override": True
+        })
+        client.put(string)
     return json.dumps({"status": "ok"})
 
 @route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])

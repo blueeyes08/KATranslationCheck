@@ -180,11 +180,11 @@ def index(lang):
         for key in list(string.keys()):
             if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
                 del string[key]
-        longStrings.append(string)
         # Add "original translation field"
-        entry.update({
-            "original_translation": entry["target"]
+        string.update({
+            "original_translation": string["target"]
         })
+        longStrings.append(string)
     # Ignore the patterns, put ALL the strings into a list
     return json.dumps(longStrings)
 

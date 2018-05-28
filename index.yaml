@@ -78,3 +78,7 @@ indexes:
   - name: normalized
   - name: is_approved
   - name: is_translated
+- kind: String
+  properties:
+  - name: words
+  - name: source_length

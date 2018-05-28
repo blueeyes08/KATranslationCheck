@@ -403,4 +403,31 @@ def index(lang):
     else: # Success
         return json.dumps({"status": "ok", "translation": transl})
 
+
+# Mark string as correct i.e. ignore rule for that string in the future
+@route('/apiv3/word-search/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    word = request.query.word
+    offset = int(request.query.offset or '0')
+
+    # Preproc
+    word = word.lower()
+
+    query = client.query(kind='String', namespace=lang)
+    query.add_filter('words', '=', word)
+    #query.add_filter('is_approved', '=', True)
+    #query.add_filter(rule + '_override', '=', False)
+    query.order = ['source_length']
+    query_iter = query.fetch(250, offset=offset)
+
+    strings = [doc for doc in query_iter]
+
+    for string in strings:
+        # Add "original translation field"
+        string.update({
+            "original_translation": string["target"]
+        })
+    return json.dumps(strings)
+
 run(host='localhost', port=int(os.getenv('PORT', 9921)), server='paste')

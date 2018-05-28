@@ -425,6 +425,11 @@ def index(lang):
     strings = [doc for doc in query_iter]
 
     for string in strings:
+        entry["id"] = entry.key.id_or_name
+        # Remove unneccessary fields
+        for key in list(entry.keys()):
+            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
+                del entry[key]
         # Add "original translation field"
         string.update({
             "original_translation": string["target"]

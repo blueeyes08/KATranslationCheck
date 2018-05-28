@@ -59,6 +59,8 @@ def write_entry(obj, lang):
             entity["source"] = obj["source"]
             entity["target"] = obj["target"]
             entity["translation_source"] = obj["translation_source"]
+            entity["is_translated"] = obj["is_translated"]
+            entity["is_approved"] = obj["is_approved"]
         elif entity.get("translation_source", "") == "BEAST": # Pretranslated
             # only update if string changed
             # unsure if this can happen with the same string ID

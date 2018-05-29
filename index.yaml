@@ -82,3 +82,15 @@ indexes:
   properties:
   - name: words
   - name: source_length
+- kind: String
+  properties:
+  - name: words_cs
+  - name: source_length
+- kind: String
+  properties:
+  - name: words_ngrams
+  - name: source_length
+- kind: String
+  properties:
+  - name: words_ngrams_cs
+  - name: source_length

@@ -5,6 +5,7 @@ import time
 import traceback
 import re
 import nltk
+from nltk import ngrams
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
@@ -15,6 +16,16 @@ from nltk.corpus import stopwords
 
 nltk.download("punkt")
 nltk.download("stopwords")
+
+
+def compute_ngrams(words, max_size=5):
+    # Compute ngrams
+    result = []
+    for sz in range(2, max_size+1):
+        result += [" ".join(ngram) for ngram in ngrams(words, sz)]
+    return result
+
+
 
 generic_stopwords = ["https", "nbsp"]
 
@@ -112,13 +123,33 @@ def string_update_rules(lang, obj):
     obj["normalized"] = normalized[:1200] # Limit length due to datastore limitation
     ###
     ### Update keywords
+    ###   words: CI words
+    ###   words_cs: CS words
+    ###   words_ngrams: CS words
+    ###   words_cs_ngrams: CS words
     ###
     if obj["is_translated"]:
         raw_words = nltk.word_tokenize(obj["target"])
-        obj["words"] = set((v.lower() for v in filter(lambda s: s.isalpha(), raw_words)))
+        raw_alpha_words = list(filter(lambda s: s.isalpha(), raw_words))
+        # Compute ngrams (including stopwords)
+        obj["words_ngrams"] = compute_ngrams([w.lower() for w in raw_alpha_words])
+        obj["words_ngrams_cs"] = compute_ngrams(raw_alpha_words)
+        print(obj["words_ngrams_cs"])
+        # Compute words as a set
+        obj["words"] = set((v.lower() for v in raw_alpha_words))
+        obj["words_cs"] = set(raw_alpha_words)
+        # Remove stopwords
         if lang in nltk_stopwords_langmap:
             obj["words"] -= nltk_stopwords_langmap[lang]
+            # Case sensitive
+            cs_to_remove = set()
+            for word in obj["words_cs"]: # Treat CI versions as possible stopwords
+                if word.lower() in nltk_stopwords_langmap[lang]:
+                    cs_to_remove.add(word)
+            obj["words_cs"] -= cs_to_remove
+        # Make lists from sets
         obj["words"] = list(obj["words"])
+        obj["words_cs"] = list(obj["words_cs"])
 
 def export_lang_to_db(lang, filt):
     count = 0

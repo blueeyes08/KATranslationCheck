@@ -130,11 +130,10 @@ def string_update_rules(lang, obj):
     ###
     if obj["is_translated"]:
         raw_words = nltk.word_tokenize(obj["target"])
-        raw_alpha_words = list(filter(lambda s: s.isalpha(), raw_words))
+        raw_alpha_words = list(filter(lambda s: (s and s.isalpha()), raw_words))
         # Compute ngrams (including stopwords)
         obj["words_ngrams"] = compute_ngrams([w.lower() for w in raw_alpha_words])
         obj["words_ngrams_cs"] = compute_ngrams(raw_alpha_words)
-        print(obj["words_ngrams_cs"])
         # Compute words as a set
         obj["words"] = set((v.lower() for v in raw_alpha_words))
         obj["words_cs"] = set(raw_alpha_words)

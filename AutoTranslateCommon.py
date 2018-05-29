@@ -32,7 +32,7 @@ def get_formula_re():
     return re.compile(r"\$[^\$]+\$") 
 
 def get_image_regex():
-    return re.compile(r"((!\[([^\]]+)?\]\()?\s*(http|https|web\+graphie):\/\/(ka-perseus-(images|graphie)\.s3\.amazonaws\.com|fastly\.kastatic\.org\/ka-perseus-graphie)\/[0-9a-f]+(\.(svg|png|jpg|gif))?\)?)")
+    return re.compile(r"((!\[([^\]]+)?\]\()?\s*(http|https|web\+graphie):\/\/(ka-perseus-(images|graphie)\.s3\.amazonaws\.com|fastly\.kastatic\.org\/ka-perseus-graphie)\/[0-9a-f]+(\.(svg|png|jpg))?\)?)")
 
 def get_input_re():
     return re.compile(r"\[\[☃\s+[a-z-]+\s*\d*\]\]")

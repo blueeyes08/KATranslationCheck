@@ -438,7 +438,7 @@ def index(lang):
     if not caseSensitive:
         word = word.lower()
 
-    field = "words_ngrams" if searchNgrams else "words"
+    field = "words_ngrams"
     if caseSensitive:
         field += "_cs"
 

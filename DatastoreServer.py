@@ -51,9 +51,9 @@ def enable_cors(fn):
 
     return _enable_cors
 
-def populate(lang, pattern):
-    unapproved_ids = (pattern.get("untranslated", []) + pattern.get("translated", []))[:250]
-    approved_ids = pattern.get("approved", [])[:250]
+def populate(lang, pattern, limit=250, alsoApproved=False):
+    unapproved_ids = (pattern.get("untranslated", []) + pattern.get("translated", []))[:limit]
+    approved_ids = pattern.get("approved", [])[:limit]
     all_ids = unapproved_ids + approved_ids
     all_keys = [client.key('String', kid, namespace=lang) for kid in all_ids]
     entries, _ = chunkClient.get_multi(all_keys)
@@ -83,7 +83,7 @@ def populate(lang, pattern):
         translation = majority_vote(normalized)
 
     # If there are no leftover strings, reindex that pattern asynchronous
-    if len(nonApproved) == 0:
+    if len(nonApproved) == 0 and not alsoApproved:
         print("Empty pattern, reindexing")
         # Reindex for both relevant_for_live settings
         executor.submit(index_pattern, client, lang, pattern["pattern"], True)
@@ -92,7 +92,7 @@ def populate(lang, pattern):
     # Map pattern
     return {
         "pattern": pattern["pattern"],
-        "strings": nonApproved,
+        "strings": nonApproved if not alsoApproved else (nonApproved + approved),
         "translation": translation
     }
 
@@ -124,6 +124,24 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_lim
 def index(lang):
     all_filenames = list(get_all_filenames("de"))
     return json.dumps(all_filenames)
+
+
+# Single pattern
+@route('/apiv3/pattern/<lang>', method=['OPTIONS', 'GET'])
+@enable_cors
+def index(lang):
+    pattern = request.query.pattern[:500]
+    onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
+    limit = int(request.query.limit or "250")
+    # fetch pattern
+    prefix = "live" if onlyRelevantForLive else "all"
+    key = client.key('Pattern', "{}#{}".format(prefix, pattern), namespace=lang)
+    patternInfo = client.get(key)
+    if not patternInfo:
+        return "{}"
+    # Populate pattern
+    populated = populate(lang, patternInfo, alsoApproved=True)
+    return json.dumps(populated) if populated else "{}"
 
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])

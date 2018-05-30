@@ -28,6 +28,7 @@ client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(512)
 chunkClient = DatastoreChunkClient(client, executor)
 default_string_projection = ['source', 'target', 'id', 'file', 'is_translated', 'is_approved', 'translation_source']
+string_ignore_fields = set(["words", "words_cs", "words_ngrams", "words_ngrams_cs", "source_length", "relevant_for_live"])
 
 currently_indexing = []
 
@@ -61,7 +62,7 @@ def populate(lang, pattern):
         entry["id"] = entry.key.id_or_name
         # Remove unneccessary fields
         for key in list(entry.keys()):
-            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
+            if key.startswith("has_") or key in string_ignore_fields:
                 del entry[key]
         # Add "original translation field"
         entry.update({
@@ -178,7 +179,7 @@ def index(lang):
         string["id"] = entity.key.id_or_name
         # Remove unneccessary fields
         for key in list(string.keys()):
-            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
+            if key.startswith("has_") or key in string_ignore_fields:
                 del string[key]
         # Add "original translation field"
         string.update({
@@ -411,15 +412,24 @@ def index(lang):
 def index(lang):
     word = request.query.word
     offset = int(request.query.offset or '0')
+    caseSensitive = request.query.cs == 'true'
+    
+    searchNgrams = " " in word
 
     # Preproc
-    word = word.lower()
+    if not caseSensitive:
+        word = word.lower()
+
+    field = "words_ngrams" if searchNgrams else "words"
+    if caseSensitive:
+        field += "_cs"
 
     query = client.query(kind='String', namespace=lang)
-    query.add_filter('words', '=', word)
+    query.add_filter(field, '=', word)
     #query.add_filter('is_approved', '=', True)
     #query.add_filter(rule + '_override', '=', False)
     query.order = ['source_length']
+    print(query.filters)
     query_iter = query.fetch(250, offset=offset)
 
     strings = [doc for doc in query_iter]
@@ -428,7 +438,7 @@ def index(lang):
         string["id"] = string.key.id_or_name
         # Remove unneccessary fields
         for key in list(string.keys()):
-            if key.startswith("has_") or key in ["words", "source_length", "relevant_for_live"]:
+            if key.startswith("has_") or key in string_ignore_fields:
                 del string[key]
         # Add "original translation field"
         string.update({

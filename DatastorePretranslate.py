@@ -29,7 +29,7 @@ def pretranslate_string(client, lang, string, retries_left=3):
     except Exception as ex:
         traceback.print_exc()
 
-def pretranslate(client, executor, lang, file):
+def pretranslate(client, executor, lang, file, overwrite=False):
     query = client.query(kind='String', namespace=lang)
     query.add_filter('translation_source', '=', 'Crowdin')
     query.add_filter('is_translated', '=', False)
@@ -40,6 +40,9 @@ def pretranslate(client, executor, lang, file):
     futures = []
     for result in query_iter:
         count += 1
+        # Skip already translated strings
+        if (string["translation_source"] == "BEAST" and not overwrite):
+            return
         # Index with and without relevant_for_live
         futures.append(executor.submit(pretranslate_string, client, lang, result))
         #pretranslate_string(client, lang, result)
@@ -55,12 +58,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', help='The crowdin lang code')
     parser.add_argument('-f','--file', help='File code to filter for')
+    parser.add_argument('-o','--overwrite', action='store_true', help='Overwrite old pretranslations')
     parser.add_argument('-j','--threads', default=3, type=int, help='Number of threads. Reduce on rate error')
     args = parser.parse_args()
 
     client = datastore.Client(project="watts-198422")
     executor = ThreadPoolExecutor(args.threads)
 
-    pretranslate(client, executor, args.lang, args.file)
+    pretranslate(client, executor, args.lang, args.file, overwrite=args.overwrite)
     #index_pattern(client, "de", "§formula§", False)
 

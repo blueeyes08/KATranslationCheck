@@ -41,7 +41,7 @@ def pretranslate(client, executor, lang, file, overwrite=False):
     for result in query_iter:
         count += 1
         # Skip already translated strings
-        if (string["translation_source"] == "BEAST" and not overwrite):
+        if (result["translation_source"] == "BEAST" and not overwrite):
             return
         # Index with and without relevant_for_live
         futures.append(executor.submit(pretranslate_string, client, lang, result))

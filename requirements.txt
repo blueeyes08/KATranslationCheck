@@ -18,3 +18,4 @@ googletrans
 polib
 openpyxl
 google-cloud-translate
+webvtt-py

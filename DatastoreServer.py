@@ -320,7 +320,7 @@ def delayedIndexPattern(lang, pattern, delay=15):
     except ValueError:
         pass
 
-def upload_string(lang, string):
+def update_string(lang, string):
     engl = string['source']
     transl = string['target']
     fileid = string['fileid']
@@ -353,7 +353,7 @@ def upload_string(lang, string):
 @enable_cors
 def index(lang):
     string = json.load(request.body)
-    upload_string(lang, string)
+    update_string(lang, string)
     return json.dumps({"status": "ok"})
 
 
@@ -362,7 +362,7 @@ def index(lang):
 def index(lang): # multi string upload
     strings = json.load(request.body)
     for string in strings:
-        upload_string(lang, string)
+        update_string(lang, string)
     return json.dumps({"status": "ok"})
 
 @route('/apiv3/texttag/<lang>', method=['OPTIONS', 'GET'])

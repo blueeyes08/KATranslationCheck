@@ -89,7 +89,7 @@ genericIFTranslator = IFPatternAutotranslator("de")
 
 def string_update_rules(lang, obj):
     #
-    obj["has_decimal_point"] = obj["is_translated"] and (decimal_point_regex.search(obj["target"]) is not None)
+    obj["has_decimal_point"] = obj["is_translated"] and obj["target"].count("$") >= 2 and (decimal_point_regex.search(obj["target"]) is not None)
     if "has_decimal_point_override" not in obj:
         obj["has_decimal_point_override"] = False
     #

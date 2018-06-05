@@ -102,12 +102,11 @@ def string_update_rules(lang, obj):
         obj["has_coordinate_without_pipe_override"] = False
     #
     obj["has_double_comma"] = obj["is_translated"] and (double_comma_regex.search(obj["target"]) is not None)
-    if "has_double_comma" not in obj:
+    if "has_double_comma_override" not in obj:
         obj["has_double_comma_override"] = False
-        obj["has_coordinate_without_pipe_override"] = False
     #
     obj["has_literal_dollar"] = obj["is_translated"] and (literal_dollar_regex.search(obj["target"]) is not None)
-    if "has_literal_dollar" not in obj:
+    if "has_literal_dollar_override" not in obj:
         obj["has_literal_dollar_override"] = False
     ###
     ### Update pattern

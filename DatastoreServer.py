@@ -25,7 +25,7 @@ logging_client = logging.Client()
 
 logger = logging_client.logger("Babelfish")
 client = datastore.Client(project="watts-198422")
-executor = ThreadPoolExecutor(512)
+executor = ThreadPoolExecutor(1024)
 chunkClient = DatastoreChunkClient(client, executor)
 default_string_projection = ['source', 'target', 'id', 'file', 'is_translated', 'is_approved', 'translation_source']
 string_ignore_fields = set(["words", "words_cs", "words_ngrams", "words_ngrams_cs", "source_length", "relevant_for_live"])
@@ -320,10 +320,7 @@ def delayedIndexPattern(lang, pattern, delay=15):
     except ValueError:
         pass
 
-@route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
-@enable_cors
-def index(lang):
-    string = json.load(request.body)
+def upload_string(lang, string):
     engl = string['source']
     transl = string['target']
     fileid = string['fileid']
@@ -350,6 +347,22 @@ def index(lang):
         "was_translated": string["is_translated"],
         "was_approved": string["is_approved"]
     })
+
+
+@route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang):
+    string = json.load(request.body)
+    upload_string(lang, string)
+    return json.dumps({"status": "ok"})
+
+
+@route('/apiv3/upload-strings/<lang>', method=['OPTIONS', 'POST'])
+@enable_cors
+def index(lang): # multi string upload
+    strings = json.load(request.body)
+    for string in strings:
+        upload_string(lang, string)
     return json.dumps({"status": "ok"})
 
 @route('/apiv3/texttag/<lang>', method=['OPTIONS', 'GET'])

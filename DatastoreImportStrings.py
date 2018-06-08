@@ -37,7 +37,11 @@ coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a
 double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
 literal_dollar_regex = re.compile(r"\\\$(?=\s*\S)")
 space_around_url_regex = re.compile(r"(!\[\]\s+\(|!\s+\[\]\(|!\s+\[\]\s+\()")
-possible_thousands_separator = re.compile(r"(\{,\}|,)\d{3}")
+possible_thousands_separator_re = re.compile(r"(\d+)(\{,\}|,)(\d{3})")
+
+def has_possible_thousands_separator(source, target):
+    for rgx in possible_thousands_separator_re.findall(source):
+        return ("{},{}".format(rgx[0], rgx[2]) in target or "{}{{,}}{}".format(rgx[0], rgx[2]) in target)
 
 relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articles.xliff",
     "2_high_priority_content/learn.math.early-math.exercises.xliff",
@@ -115,7 +119,7 @@ def string_update_rules(lang, obj):
     if "has_space_around_url_override" not in obj:
         obj["has_space_around_url_override"] = False
     #
-    obj["has_possible_thousands_separator"] = obj["is_translated"] and (possible_thousands_separator.search(obj["target"]) is not None)
+    obj["has_possible_thousands_separator"] = obj["is_translated"] and has_possible_thousands_separator(obj["source"], obj["target"])
     if "has_possible_thousands_separator_override" not in obj:
         obj["has_possible_thousands_separator_override"] = False
     ###

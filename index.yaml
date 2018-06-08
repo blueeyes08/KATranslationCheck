@@ -55,6 +55,11 @@ indexes:
 - kind: String
   properties:
   - name: file
+  - name: source_length
+    direction: desc
+- kind: String
+  properties:
+  - name: file
   - name: is_approved
   - name: sourceLength
     direction: desc

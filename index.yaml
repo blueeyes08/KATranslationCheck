@@ -86,3 +86,13 @@ indexes:
   properties:
   - name: words_ngrams_cs
   - name: source_length
+- kind: String
+  properties:
+  - name: has_space_around_url
+  - name: has_space_around_url_override
+  - name: source_length
+- kind: String
+  properties:
+  - name: has_possible_thousands_separator
+  - name: has_possible_thousands_separator_override
+  - name: source_length

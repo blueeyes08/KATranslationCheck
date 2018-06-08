@@ -35,7 +35,7 @@ executor = ThreadPoolExecutor(1024)
 decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
 double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
-literal_dollar_regex = re.compile(r"\\\$(?=.)")
+literal_dollar_regex = re.compile(r"\\\$\s*(?=.)")
 
 relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articles.xliff",
     "2_high_priority_content/learn.math.early-math.exercises.xliff",

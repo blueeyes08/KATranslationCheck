@@ -36,6 +36,8 @@ decimal_point_regex = re.compile(r"(-?\d+\}?)\.(-?\d+|\\\\[a-z]+\{\d+)")
 coordinate_regex = re.compile(r"\$([A-Z]?\{?)\(\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*[,;|]\s*(-?\d+(([\.,]|\{,\})\d+)?|-?[a-z]|-?\\\\[a-z]+[A-Z]?\{-?\d+[.,]?\d*\})\s*\)(\}?)\$")
 double_comma_regex = re.compile(r"(,|\{,\}|\.)\d+(,|\{,\}|\.)")
 literal_dollar_regex = re.compile(r"\\\$(?=\s*\S)")
+space_around_url_regex = re.compile(r"(!\[\]\s+\(|!\s+\[\]\(|!\s+\[\]\s+\()")
+possible_thousands_separator = re.compile(r"(\{,\}|,)\d{3}")
 
 relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articles.xliff",
     "2_high_priority_content/learn.math.early-math.exercises.xliff",
@@ -108,6 +110,14 @@ def string_update_rules(lang, obj):
     obj["has_literal_dollar"] = obj["is_translated"] and (literal_dollar_regex.search(obj["target"]) is not None)
     if "has_literal_dollar_override" not in obj:
         obj["has_literal_dollar_override"] = False
+    #
+    obj["has_space_around_url"] = obj["is_translated"] and (space_around_url_regex.search(obj["target"]) is not None)
+    if "has_space_around_url_override" not in obj:
+        obj["has_space_around_url_override"] = False
+    #
+    obj["has_possible_thousands_separator"] = obj["is_translated"] and (possible_thousands_separator.search(obj["target"]) is not None)
+    if "has_possible_thousands_separator_override" not in obj:
+        obj["has_possible_thousands_separator_override"] = False
     ###
     ### Update pattern
     ###

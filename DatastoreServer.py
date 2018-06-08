@@ -393,6 +393,10 @@ def index(lang):
     entries = list(query_iter)
     for entry in entries:
         entry["id"] = entry.key.id_or_name
+        # Remove unneccessary fields
+        for key in list(entry.keys()):
+            if key.startswith("has_") or key in string_ignore_fields:
+                del entry[key]
         # Add "original translation field"
         entry.update({
             "original_translation": entry["target"]

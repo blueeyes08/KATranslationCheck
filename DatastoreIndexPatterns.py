@@ -35,15 +35,20 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         if onlyRelevantForLive:
             query.add_filter('relevant_for_live', '=', True)
         query.add_filter('normalized', '=', pattern)
-        query.projection = ['is_approved', 'is_translated']
+        query.projection = ['is_approved', 'is_translated', 'file']
+        unapproved_files = set()
+        all_files = set()
         # ... and add them to the list
         for result in query.fetch():
             if result["is_approved"]:
                 patternInfo["approved"].append(result.key.id)
             elif result["is_translated"]:
+                unapproved_files.add(patternInfo["file"])
                 patternInfo["translated"].append(result.key.id)
             else:
+                unapproved_files.add(patternInfo["file"])
                 patternInfo["untranslated"].append(result.key.id)
+            all_files.add(patternInfo["file"])
         # Complete stats
         patternInfo["num_approved"] = len(patternInfo["approved"])
         patternInfo["num_translated"] = len(patternInfo["translated"])
@@ -54,6 +59,9 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
         patternInfo["untranslated"] = patternInfo["untranslated"][:500]
         patternInfo["translated"] = patternInfo["translated"][:500]
         patternInfo["approved"] = patternInfo["approved"][:500]
+        # File lists
+        patternInfo["all_files"] = sorted(list(all_files))
+        patternInfo["unapproved_files"] = sorted(list(unapproved_files))
         # Write to DB
         if patternInfo["num_total"] >= 2:
             # Stats

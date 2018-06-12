@@ -16,7 +16,7 @@ import traceback
 from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
-from DatastoreIndexPatterns import index_pattern
+from DatastoreIndexPatterns import index_pattern, read_groups
 from DatastoreImportStrings import string_update_rules
 from DatastoreUtils import DatastoreChunkClient
 from UliEngineering.SignalProcessing.Selection import *
@@ -145,6 +145,11 @@ def index(lang):
     populated = populate(lang, patternInfo, alsoApproved=True)
     return json.dumps(populated) if populated else "{}"
 
+
+@route('/apiv3/groups', method=['OPTIONS', 'GET'])
+@enable_cors
+def index():
+    return json.dumps([group["name"] for group in read_groups()])
 
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors

@@ -2,6 +2,7 @@
 """
 Simple requests-based (non-cached) interface
 """
+import re
 import requests
 from ansicolor import black
 import json

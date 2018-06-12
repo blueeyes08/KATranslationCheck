@@ -38,6 +38,11 @@ indexes:
   - name: relevant_for_live
   - name: num_unapproved
     direction: desc
+- kind: Pattern
+  properties:
+  - name: group
+  - name: num_unapproved
+    direction: desc
 - kind: String
   properties:
   - name: is_approved

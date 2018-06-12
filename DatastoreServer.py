@@ -96,13 +96,13 @@ def populate(lang, pattern, limit=250, alsoApproved=False):
         "translation": translation
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False, fileFilter=None):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False, group=None):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', True)
-    if fileFilter:
-        query.add_filter('unapproved_files', '=', fileFilter)
+    if group:
+        query.add_filter('group', '=', group)
 
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
@@ -149,12 +149,11 @@ def index(lang):
 @route('/apiv3/patterns/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
-    offset = int(request.query.offset) or 0
+    offset = int(request.query.offset or '0')
     n = int(request.query.n) or 20
-    file = request.query.file or None
-    print(file)
+    group = request.query.group or None
     onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
-    return json.dumps(findCommonPatterns(lang, offset=offset, n=n, onlyRelevantForLive=onlyRelevantForLive, fileFilter=file))
+    return json.dumps(findCommonPatterns(lang, offset=offset, n=n, onlyRelevantForLive=onlyRelevantForLive, group=group))
 
 @route('/apiv3/extract-texttags-from-strings/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

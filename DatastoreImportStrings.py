@@ -5,6 +5,8 @@ import time
 import traceback
 import re
 import nltk
+import concurrent.futures
+from deepdiff import DeepDiff
 from nltk import ngrams
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
@@ -18,6 +20,8 @@ from DatastoreIndexPatterns import read_groups_set
 nltk.download("punkt")
 nltk.download("stopwords")
 
+ignored = 0
+updated = 0
 
 def compute_ngrams(words, max_size=5):
     # Compute ngrams
@@ -60,10 +64,13 @@ relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articl
 
 # Create & store an entity
 def write_entry(obj, lang, groups):
+    global ignored
+    global updated
     try:
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
         entity = client.get(key) or datastore.Entity(key, exclude_from_indexes=string_exclude_from_indexes)
+        orig_entity = dict(entity)
         # Update translations
         if obj["is_translated"] or obj["is_approved"]:
             # Update everything
@@ -88,9 +95,17 @@ def write_entry(obj, lang, groups):
         # Update keys that were previously not present
         entity.update(merge(obj, entity))
         string_update_rules(lang, entity, groups)
-        client.put(entity)
+        # Did we change anything relevant?
+        if len(DeepDiff(orig_entity, dict(entity))) > 0:
+            client.put(entity)
+            updated += 1
+            return True
+        else:
+            ignored += 1
+            return False
     except Exception as ex:
         traceback.print_exc()
+        return False
 
 genericIFTranslator = IFPatternAutotranslator("de")
 
@@ -157,6 +172,7 @@ def string_update_rules(lang, obj, groups):
 def export_lang_to_db(lang, filt):
     count = 0
     groups = read_groups_set()
+    futures = []
     for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
@@ -185,11 +201,14 @@ def export_lang_to_db(lang, filt):
                 "relevant_for_live": relevant_for_live
             }
             # Async write
-            executor.submit(write_entry, obj, lang, groups)
+            futures.append(executor.submit(write_entry, obj, lang, groups))
             # Stats
             count += 1
             if count % 1000 == 0:
                 print("Processed {} records".format(count))
+    for future in concurrent.futures.as_completed(futures):
+        pass
+    print("Updated {} strings, ignored {} strings".format(updated, ignored))
 
 if __name__ == "__main__":
     import argparse

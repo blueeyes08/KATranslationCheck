@@ -40,7 +40,7 @@ indexes:
     direction: desc
 - kind: Pattern
   properties:
-  - name: group
+  - name: groups
   - name: num_unapproved
     direction: desc
 - kind: String

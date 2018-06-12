@@ -102,7 +102,7 @@ def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_lim
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', True)
     if group:
-        query.add_filter('group', '=', group)
+        query.add_filter('groups', '=', group)
 
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)

@@ -236,7 +236,8 @@ def updateStringTranslation(lang, sid, newTranslation, src="SmartTranslation", j
                 "is_approved": True
             })
         # Update rules
-        string_update_rules(lang, value)
+        groups = read_groups_set()
+        string_update_rules(lang, value, groups)
         print(value)
         client.put(value)
     except Exception as ex:

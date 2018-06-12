@@ -1,0 +1,34 @@
+[{
+    "name": "DA - Current content",
+    "files": ["2_high_priority_content/learn.math.algebra-basics.exercises.xliff",
+        "2_high_priority_content/learn.math.algebra-basics.articles.xliff",
+        "2_high_priority_content/learn.math.arithmetic.exercises.xliff",
+        "2_high_priority_content/learn.math.arithmetic.articles.xliff",
+        "2_high_priority_content/learn.math.early-math.exercises.xliff",
+        "2_high_priority_content/learn.math.early-math.articles.xliff",
+        "2_high_priority_content/learn.math.pre-algebra.exercises.xliff",
+        "2_high_priority_content/learn.math.pre-algebra.articles.xliff",
+        "2_high_priority_content/learn.math.basic-geo.exercises.xliff",
+        "2_high_priority_content/learn.math.basic-geo.articles.xliff",
+        "2_high_priority_content/learn.math.cc-third-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-third-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-fourth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-fourth-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-fifth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-fifth-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-sixth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-sixth-grade-math.articles.xliff"
+    ]
+}, {
+    "name": "Grades 3/4/5",
+    "files": [
+        "2_high_priority_content/learn.math.cc-third-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-third-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-fourth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-fourth-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-fifth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-fifth-grade-math.articles.xliff",
+        "2_high_priority_content/learn.math.cc-sixth-grade-math.exercises.xliff",
+        "2_high_priority_content/learn.math.cc-sixth-grade-math.articles.xliff"
+    ]
+}]

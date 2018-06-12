@@ -96,11 +96,13 @@ def populate(lang, pattern, limit=250, alsoApproved=False):
         "translation": translation
     }
 
-def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False):
+def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False, fileFilter=None):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
     if onlyRelevantForLive:
         query.add_filter('relevant_for_live', '=', True)
+    if fileFilter:
+        query.add_filter('unapproved_files', '=', fileFilter)
 
     query.order = ['-' + orderBy]
     query_iter = query.fetch(n, offset=offset)
@@ -149,8 +151,10 @@ def index(lang):
 def index(lang):
     offset = int(request.query.offset) or 0
     n = int(request.query.n) or 20
+    file = request.query.file or None
+    print(file)
     onlyRelevantForLive = request.query.onlyRelevantForLive == "true"
-    return json.dumps(findCommonPatterns(lang, offset=offset, n=n, onlyRelevantForLive=onlyRelevantForLive))
+    return json.dumps(findCommonPatterns(lang, offset=offset, n=n, onlyRelevantForLive=onlyRelevantForLive, fileFilter=file))
 
 @route('/apiv3/extract-texttags-from-strings/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors

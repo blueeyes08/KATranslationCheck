@@ -4,6 +4,7 @@ from collections import namedtuple
 import time
 import traceback
 import sys
+import json
 from XLIFFToXLSX import process_xliff_soup
 from XLIFFReader import findXLIFFFiles, parse_xliff_file
 from concurrent.futures import ThreadPoolExecutor
@@ -15,7 +16,11 @@ pattern_exclude_from_indexes = ('pattern', 'approved', 'translated', 'untranslat
 
 total_string_count = 0
 
-def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
+def read_groups():
+    with open("groups.json") as infile:
+        return json.load(infile)
+
+def index_pattern(client, lang, pattern, groups, onlyRelevantForLive=False):
     global total_string_count
     try:
         prefix = "live" if onlyRelevantForLive else "all"
@@ -43,12 +48,20 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
             if result["is_approved"]:
                 patternInfo["approved"].append(result.key.id)
             elif result["is_translated"]:
-                unapproved_files.add(patternInfo["file"])
+                unapproved_files.add(result["file"])
                 patternInfo["translated"].append(result.key.id)
             else:
-                unapproved_files.add(patternInfo["file"])
+                unapproved_files.add(result["file"])
                 patternInfo["untranslated"].append(result.key.id)
-            all_files.add(patternInfo["file"])
+            all_files.add(result["file"])
+        # Compute groups
+        groups = set()
+        for group in groups:
+            if len(set(group["files"]) & unapproved_files) > 0:
+                groups.add(group["name"])
+        if len(groups):
+            print(groups)
+        patternInfo["groups"] = sorted(list(groups))
         # Complete stats
         patternInfo["num_approved"] = len(patternInfo["approved"])
         patternInfo["num_translated"] = len(patternInfo["translated"])
@@ -75,7 +88,7 @@ def index_pattern(client, lang, pattern, onlyRelevantForLive=False):
     except Exception as ex:
         traceback.print_exc()
 
-def index(client, executor, lang):
+def index(client, executor, lang, groups):
     query = client.query(kind='String', namespace=lang)
     query.distinct_on = ['normalized']
     query.projection = ['normalized']
@@ -85,8 +98,8 @@ def index(client, executor, lang):
     for result in query_iter:
         count += 1
         # Index with and without relevant_for_live
-        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], True))
-        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], False))
+        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], groups, True))
+        futures.append(executor.submit(index_pattern, client, lang, result["normalized"], groups, False))
     # Wait for futures to finish
     for future in concurrent.futures.as_completed(futures):
         pass
@@ -101,7 +114,9 @@ if __name__ == "__main__":
     client = datastore.Client(project="watts-198422")
     executor = ThreadPoolExecutor(1024)
 
-    index(client, executor, args.lang)
+    groups = read_groups()
+
+    index(client, executor, args.lang, groups)
     #index_pattern(client, "de", "§formula§", False)
     print("Total pattern strings: {}".format(total_string_count))
 

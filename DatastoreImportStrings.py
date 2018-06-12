@@ -147,7 +147,12 @@ def string_update_rules(lang, obj, groups):
         obj["words_ngrams"] = compute_ngrams([w.lower() for w in raw_alpha_words])
         obj["words_ngrams_cs"] = compute_ngrams(raw_alpha_words)
     ### Update groups
-    
+    string_groups = set()
+    for group in groups:
+        if obj["files"] in group["files"]:
+            string_groups.add(group["name"])
+    obj["groups"] = sorted(list(string_groups))
+    print(obj["groups"])
 
 
 def export_lang_to_db(lang, filt):

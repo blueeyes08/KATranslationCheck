@@ -72,4 +72,32 @@
         "4_low_priority/learn.science.physics.xliff",
         "4_low_priority/learn.science.in-in-class11th-physics.exercises.xliff"
     ]
+}, {
+    "name": "1_high_priority_platform",
+    "files": [
+        "1_high_priority_platform/profile.xliff",
+        "1_high_priority_platform/settings.xliff",
+        "1_high_priority_platform/coach_reports.xliff",
+        "1_high_priority_platform/avatars.xliff",
+        "1_high_priority_platform/discussion.xliff",
+        "1_high_priority_platform/content.chrome.xliff",
+        "1_high_priority_platform/knowledge_map.xliff",
+        "1_high_priority_platform/badges.xliff",
+        "1_high_priority_platform/goals.xliff",
+        "1_high_priority_platform/homepage.xliff",
+        "1_high_priority_platform/manual.xliff",
+        "1_high_priority_platform/about.privacy_policy.xliff",
+        "1_high_priority_platform/report_issues.xliff",
+        "1_high_priority_platform/mobile.ios.xliff",
+        "1_high_priority_platform/notifications.xliff",
+        "1_high_priority_platform/login_and_registration.xliff",
+        "1_high_priority_platform/mobile.android.xliff",
+        "1_high_priority_platform/about.donate.xliff",
+        "1_high_priority_platform/computer_science.xliff",
+        "1_high_priority_platform/_other_.xliff",
+        "1_high_priority_platform/about.terms_of_service.xliff",
+        "1_high_priority_platform/tags.xliff",
+        "1_high_priority_platform/exercises.shared.xliff",
+        "1_high_priority_platform/email.xliff"
+    ]
 }]

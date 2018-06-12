@@ -100,8 +100,7 @@ def populate(lang, pattern, limit=250, alsoApproved=False):
 def findCommonPatterns(lang, orderBy='num_unapproved', n=20, offset=0, total_limit=2500, onlyRelevantForLive=False, group=None):
     query = client.query(kind='Pattern', namespace=lang)
     query.add_filter('num_unapproved', '>', 0)
-    if onlyRelevantForLive:
-        query.add_filter('relevant_for_live', '=', True)
+    query.add_filter('relevant_for_live', '=', onlyRelevantForLive)
     if group:
         query.add_filter('groups', '=', group)
 

@@ -97,6 +97,8 @@ def write_entry(obj, lang, groups):
         string_update_rules(lang, entity, groups)
         # Did we change anything relevant?
         if len(DeepDiff(orig_entity, dict(entity))) > 0:
+            print(DeepDiff(orig_entity, dict(entity)))
+            print(orig_entity)
             client.put(entity)
             updated += 1
             return True
@@ -159,8 +161,8 @@ def string_update_rules(lang, obj, groups):
         raw_words = nltk.word_tokenize(obj["target"])
         raw_alpha_words = list(filter(lambda s: (s and s.isalpha()), raw_words))
         # Compute ngrams (including stopwords)
-        obj["words_ngrams"] = compute_ngrams([w.lower() for w in raw_alpha_words])
-        obj["words_ngrams_cs"] = compute_ngrams(raw_alpha_words)
+        obj["words_ngrams"] = sorted(compute_ngrams([w.lower() for w in raw_alpha_words]))
+        obj["words_ngrams_cs"] = sorted(compute_ngrams(raw_alpha_words))
     ### Update groups
     string_groups = set()
     for group in groups:

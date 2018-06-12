@@ -59,7 +59,7 @@ relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articl
     "1_high_priority_platform/_other_.xliff"]
 
 # Create & store an entity
-def write_entry(obj, lang, rules):
+def write_entry(obj, lang, groups):
     try:
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
@@ -149,10 +149,9 @@ def string_update_rules(lang, obj, groups):
     ### Update groups
     string_groups = set()
     for group in groups:
-        if obj["files"] in group["files"]:
+        if obj["file"] in group["files"]:
             string_groups.add(group["name"])
     obj["groups"] = sorted(list(string_groups))
-    print(obj["groups"])
 
 
 def export_lang_to_db(lang, filt):

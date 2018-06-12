@@ -97,8 +97,8 @@ def write_entry(obj, lang, groups):
         string_update_rules(lang, entity, groups)
         # Did we change anything relevant?
         if len(DeepDiff(orig_entity, dict(entity))) > 0:
-            print(DeepDiff(orig_entity, dict(entity)))
-            print(orig_entity)
+            #print(DeepDiff(orig_entity, dict(entity)))
+            #print(orig_entity)
             client.put(entity)
             updated += 1
             return True

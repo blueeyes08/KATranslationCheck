@@ -16,7 +16,7 @@ import traceback
 from AutoTranslationIndexer import *
 from AutoTranslationTranslator import *
 from bottle import route, run, request, response
-from DatastoreIndexPatterns import index_pattern, read_groups
+from DatastoreIndexPatterns import index_pattern, read_groups, read_groups_set
 from DatastoreImportStrings import string_update_rules
 from DatastoreUtils import DatastoreChunkClient
 from UliEngineering.SignalProcessing.Selection import *
@@ -329,6 +329,7 @@ def delayedIndexPattern(lang, pattern, delay=15):
         currently_indexing.remove(pattern)
     except ValueError:
         pass
+    
 
 def update_string(lang, string):
     engl = string['source']

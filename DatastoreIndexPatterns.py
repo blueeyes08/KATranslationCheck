@@ -24,6 +24,7 @@ def read_groups_set():
     groups = read_groups()
     for group in groups:
         group["files"] = set(group["files"])
+    return groups
 
 def index_pattern(client, lang, pattern, groups, onlyRelevantForLive=False):
     global total_string_count

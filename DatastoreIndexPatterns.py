@@ -55,13 +55,11 @@ def index_pattern(client, lang, pattern, groups, onlyRelevantForLive=False):
                 patternInfo["untranslated"].append(result.key.id)
             all_files.add(result["file"])
         # Compute groups
-        groups = set()
+        pattern_groups = set()
         for group in groups:
             if len(set(group["files"]) & unapproved_files) > 0:
-                groups.add(group["name"])
-        if len(groups):
-            print(groups)
-        patternInfo["groups"] = sorted(list(groups))
+                pattern_groups.add(group["name"])
+        patternInfo["groups"] = sorted(list(pattern_groups))
         # Complete stats
         patternInfo["num_approved"] = len(patternInfo["approved"])
         patternInfo["num_translated"] = len(patternInfo["translated"])

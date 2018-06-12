@@ -319,9 +319,11 @@ def delayedIndexPattern(lang, pattern, delay=15):
     currently_indexing.append(pattern)
     # Delay
     time.sleep(delay) # Allow DB to sync
+    # Read current groups
+    groups = read_groups_set()
     # Index with both relevant_for_live settings
-    executor.submit(index_pattern, client, lang, pattern, True)
-    executor.submit(index_pattern, client, lang, pattern, False)
+    executor.submit(index_pattern, client, lang, pattern, groups, True)
+    executor.submit(index_pattern, client, lang, pattern, groups, False)
     # Remove from queue
     try:
         currently_indexing.remove(pattern)

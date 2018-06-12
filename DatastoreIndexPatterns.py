@@ -20,6 +20,11 @@ def read_groups():
     with open("groups.json") as infile:
         return json.load(infile)
 
+def read_groups_set():
+    groups = read_groups()
+    for group in groups:
+        group["files"] = set(group["files"])
+
 def index_pattern(client, lang, pattern, groups, onlyRelevantForLive=False):
     global total_string_count
     try:
@@ -112,7 +117,7 @@ if __name__ == "__main__":
     client = datastore.Client(project="watts-198422")
     executor = ThreadPoolExecutor(1024)
 
-    groups = read_groups()
+    groups = read_groups_set()
 
     index(client, executor, args.lang, groups)
     #index_pattern(client, "de", "§formula§", False)

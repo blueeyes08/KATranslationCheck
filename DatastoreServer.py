@@ -86,8 +86,9 @@ def populate(lang, pattern, limit=250, alsoApproved=False):
     if len(nonApproved) == 0 and not alsoApproved:
         print("Empty pattern, reindexing")
         # Reindex for both relevant_for_live settings
-        executor.submit(index_pattern, client, lang, pattern["pattern"], True)
-        executor.submit(index_pattern, client, lang, pattern["pattern"], False)
+        groups = read_groups_set()
+        executor.submit(index_pattern, client, lang, pattern["pattern"], groups, True)
+        executor.submit(index_pattern, client, lang, pattern["pattern"], groups, False)
         return None
     # Map pattern
     return {

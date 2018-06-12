@@ -13,6 +13,7 @@ from ansicolor import black, green
 from toolz.dicttoolz import merge
 from AutoTranslationTranslator import IFPatternAutotranslator
 from nltk.corpus import stopwords
+from DatastoreIndexPatterns import read_groups_set
 
 nltk.download("punkt")
 nltk.download("stopwords")
@@ -58,7 +59,7 @@ relevant_for_live_files = ["2_high_priority_content/learn.math.early-math.articl
     "1_high_priority_platform/_other_.xliff"]
 
 # Create & store an entity
-def write_entry(obj, lang):
+def write_entry(obj, lang, rules):
     try:
         key = client.key('String', obj["id"], namespace=lang)
         del obj["id"]
@@ -86,14 +87,14 @@ def write_entry(obj, lang):
             entity["translation_source"] = obj["translation_source"]
         # Update keys that were previously not present
         entity.update(merge(obj, entity))
-        string_update_rules(lang, entity)
+        string_update_rules(lang, entity, groups)
         client.put(entity)
     except Exception as ex:
         traceback.print_exc()
 
 genericIFTranslator = IFPatternAutotranslator("de")
 
-def string_update_rules(lang, obj):
+def string_update_rules(lang, obj, groups):
     #
     obj["has_decimal_point"] = obj["is_translated"] and obj["target"].count("$") >= 2 and (decimal_point_regex.search(obj["target"]) is not None)
     if "has_decimal_point_override" not in obj:
@@ -145,9 +146,13 @@ def string_update_rules(lang, obj):
         # Compute ngrams (including stopwords)
         obj["words_ngrams"] = compute_ngrams([w.lower() for w in raw_alpha_words])
         obj["words_ngrams_cs"] = compute_ngrams(raw_alpha_words)
+    ### Update groups
+    
+
 
 def export_lang_to_db(lang, filt):
     count = 0
+    groups = read_groups_set()
     for file in findXLIFFFiles("cache/{}".format(lang), filt=filt):
         # e.g. '1_high_priority_platform/about.donate.xliff'
         canonicalFilename = "/".join(file.split("/")[2:])
@@ -176,7 +181,7 @@ def export_lang_to_db(lang, filt):
                 "relevant_for_live": relevant_for_live
             }
             # Async write
-            executor.submit(write_entry, obj, lang)
+            executor.submit(write_entry, obj, lang, groups)
             # Stats
             count += 1
             if count % 1000 == 0:

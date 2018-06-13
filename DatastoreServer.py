@@ -24,6 +24,7 @@ from google.cloud import logging
 logging_client = logging.Client()
 
 logger = logging_client.logger("Babelfish")
+render_errors_logger = logging_client.logger("KaTeX-Render-Errors")
 client = datastore.Client(project="watts-198422")
 executor = ThreadPoolExecutor(1024)
 chunkClient = DatastoreChunkClient(client, executor)
@@ -360,14 +361,19 @@ def update_string(lang, string):
         "was_approved": string["is_approved"]
     })
 
+@route('/apiv3/report-failed-rendering', method=['OPTIONS', 'POST'])
+@enable_cors
+def report_broken_rendering():
+    info = json.load(request.body)
+    executor.submit(render_errors_logger.log_struct, info)
+    return json.dumps({"status": "ok"}).encode("utf-8")
 
 @route('/apiv3/upload-string/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
 def index(lang):
     string = json.load(request.body)
     update_string(lang, string)
-    return json.dumps({"status": "ok"})
-
+    return json.dumps({"status": "ok"}).encode("utf-8")
 
 @route('/apiv3/upload-strings/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
@@ -375,20 +381,20 @@ def index(lang): # multi string upload
     strings = json.load(request.body)
     for string in strings:
         update_string(lang, string)
-    return json.dumps({"status": "ok"})
+    return json.dumps({"status": "ok"}).encode("utf-8")
 
 @route('/apiv3/texttag/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
     texttag = request.query.texttag or ""
     texttag = client.get(client.key('Texttag', texttag, namespace=lang))
-    return json.dumps(texttag or {})
+    return json.dumps(texttag or {}).encode("utf-8")
 
 @route('/apiv3/texttags/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
 def index(lang):
     offset = request.query.offset or 0
-    return json.dumps(findTexttags(lang, offset))
+    return json.dumps(findTexttags(lang, offset)).encode("utf-8")
 
 @route('/apiv3/correctable-strings/<lang>', method=['OPTIONS', 'GET'])
 @enable_cors
@@ -428,7 +434,7 @@ def index(lang):
             rule + "_override": True
         })
         client.put(string)
-    return json.dumps({"status": "ok"})
+    return json.dumps({"status": "ok"}).encode("utf-8")
 
 @route('/apiv3/save-texttag/<lang>', method=['OPTIONS', 'POST'])
 @enable_cors
@@ -437,7 +443,7 @@ def index(lang):
     engl = info['english']
     transl = info['translated']
     submitTexttag(lang, engl, transl)
-    return json.dumps({"status": "ok"})
+    return json.dumps({"status": "ok"}).encode("utf-8")
 
 
 @route('/apiv3/beast-translate/<lang>', method=['OPTIONS', 'POST'])

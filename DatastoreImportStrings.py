@@ -93,12 +93,13 @@ def write_entry(obj, lang, groups):
             entity["target"] = obj["target"]
             entity["translation_source"] = obj["translation_source"]
         # Update keys that were previously not present
-        entity.update(merge(obj, entity))
         string_update_rules(lang, entity, groups)
+        entity.update(merge(obj, entity))
         # Did we change anything relevant?
         if len(DeepDiff(orig_entity, dict(entity))) > 0:
             #print(DeepDiff(orig_entity, dict(entity)))
             #print(orig_entity)
+            #print(entity["groups"])
             client.put(entity)
             updated += 1
             return True

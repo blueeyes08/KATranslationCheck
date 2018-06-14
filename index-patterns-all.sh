@@ -9,3 +9,4 @@
 ./DatastoreIndexPatterns.py pt-PT
 ./DatastoreIndexPatterns.py nb
 ./DatastoreIndexPatterns.py ka
+./DatastoreIndexPatterns.py ja

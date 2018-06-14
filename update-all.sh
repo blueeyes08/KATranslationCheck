@@ -9,3 +9,4 @@
 ./update-lang-datastore.sh pt-PT
 ./update-lang-datastore.sh nb
 ./update-lang-datastore.sh ka
+./update-lang-datastore.sh ja

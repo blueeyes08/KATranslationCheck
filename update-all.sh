@@ -10,3 +10,6 @@
 ./update-lang-datastore.sh nb
 ./update-lang-datastore.sh ka
 ./update-lang-datastore.sh ja
+./update-lang-datastore.sh lt
+./update-lang-datastore.sh hy-AM
+

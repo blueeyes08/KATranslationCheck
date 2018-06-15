@@ -10,3 +10,5 @@
 ./DatastoreIndexPatterns.py nb
 ./DatastoreIndexPatterns.py ka
 ./DatastoreIndexPatterns.py ja
+./DatastoreIndexPatterns.py lt
+./DatastoreIndexPatterns.py hy-AM
